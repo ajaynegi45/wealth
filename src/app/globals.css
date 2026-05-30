@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  /* Modern Pure White Light Theme */
-  --background: #FFFFFF; 
+  /* Modern Off-White / iOS 17 Theme */
+  --background: #F9FAFB; /* Off-white (Gray 50) */
   --foreground: #09090B; /* Zinc 950 */
   
-  --card-bg: #F4F4F5; /* Zinc 100 for contrast against white */
+  --card-bg: #FFFFFF; /* Pure white for cards */
   --card-foreground: #09090B;
   
   --secondary: #E4E4E7; /* Zinc 200 for badges and secondary elements */

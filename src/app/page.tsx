@@ -1,13 +1,14 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ArrowRight, PlayCircle, TrendingUp, Home, LineChart, Link as LinkIcon, Sparkles, ShieldCheck, Lock, PieChart, Users } from "lucide-react";
-
-export const unstable_instant = { prefetch: 'static' };
+import { Suspense } from "react";
 
 export default function HomePage() {
   return (
     <>
-      <Header />
+      <Suspense fallback={<header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-separator/50 h-16"></header>}>
+        <Header />
+      </Suspense>
       <main className="flex-1 w-full bg-background pt-16">
         
         {/* HERO SECTION */}
