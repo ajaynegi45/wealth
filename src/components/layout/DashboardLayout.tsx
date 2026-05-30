@@ -18,10 +18,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex min-h-screen bg-background relative">
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden md:flex flex-col border-r border-separator/30 bg-card/50 backdrop-blur-xl transition-all duration-300 ease-in-out relative ${
+        className={`hidden md:flex flex-col border-r border-separator/30 bg-card/50 backdrop-blur-xl transition-all duration-300 ease-in-out sticky top-0 h-screen ${
           isSidebarCollapsed ? "w-20" : "w-64"
         }`}
       >
@@ -75,7 +75,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 h-full overflow-y-auto overscroll-contain pb-24 md:pb-0 px-6 md:px-10 lg:px-12 bg-background">
+      <main className="flex-1 w-full pb-24 md:pb-0 px-6 md:px-10 lg:px-12 bg-background">
         <div className="max-w-7xl mx-auto py-8">
           {children}
         </div>

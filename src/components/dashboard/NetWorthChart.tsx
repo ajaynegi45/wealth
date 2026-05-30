@@ -58,7 +58,7 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
     const totalMonths = differenceInMonths(latest, earliest) || 1;
     const stepMonths = Math.max(1, Math.floor(totalMonths / 24)); 
 
-    let currDate = earliest;
+    let currDate = addMonths(earliest, -stepMonths);
     while (currDate <= latest) {
       const pointTotal = assets.reduce((sum, a) => {
         if (currDate < new Date(a.startDate)) return sum; 
@@ -138,7 +138,7 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
               tickMargin={8}
               tickFormatter={(value) => value.slice(0, 3) + " '" + value.slice(-2)}
               minTickGap={30}
-              padding={{ left: 30, right: 30 }}
+              padding={{ left: 10, right: 25 }}
               className="text-muted-foreground text-xs font-medium"
             />
             <ChartTooltip 
