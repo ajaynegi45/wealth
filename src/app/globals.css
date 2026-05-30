@@ -5,7 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Modern Off-White / iOS 17 Theme */ /* Off-white (Gray 50) */ /* Zinc 950 */
+
+  --background: #f5f5f7;
+  --foreground: #09090B; /* Zinc 950 */
 
   --card-bg: #FFFFFF; /* Pure white for cards */
   --card-foreground: #09090B;
