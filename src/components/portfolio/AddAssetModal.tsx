@@ -5,11 +5,14 @@ import { addAsset } from "@/app/actions/assets";
 import { toast } from "sonner";
 import { Plus, X, ChevronDown } from "lucide-react";
 
+import { useAssetStore } from "@/store/useAssetStore";
+
 export function AddAssetModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [assetType, setAssetType] = useState<"FD" | "Stock" | "Mutual Fund">("FD");
   const [bankSelection, setBankSelection] = useState("HDFC Bank");
+  const { invalidate, fetchAssets } = useAssetStore();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -76,6 +79,8 @@ export function AddAssetModal() {
         startDate,
         metadata
       });
+      invalidate();
+      await fetchAssets(true);
       toast.success(`${assetType} added successfully!`);
       setIsOpen(false);
     } catch (error) {
