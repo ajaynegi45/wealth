@@ -4,17 +4,20 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { formatINR } from "@/lib/formatters";
-import { calculateFDCurrentValue } from "@/lib/calculations/fd";
+import { calculateFDCurrentValue, calculateFDInterestPaidOut, calculateFDTDS } from "@/lib/calculations/fd";
 import { addMonths, addDays, addYears, format, max, min, differenceInMonths, differenceInDays, differenceInYears, isBefore, isAfter } from "date-fns";
 
 export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
   const today = new Date();
   
-  // Calculate Live Current Total
+  // Calculate Live Current Total and True Returns
   const totalPrincipal = assets.reduce((sum, a) => sum + Number(a.amount), 0);
+  
+  let totalAbsoluteReturns = 0;
+
   const currentTotal = assets.reduce((sum, a) => {
     if (a.type === "FD" && a.metadata) {
-      return sum + calculateFDCurrentValue(
+      const cv = calculateFDCurrentValue(
         Number(a.amount), 
         Number(a.metadata.interestRate), 
         new Date(a.startDate), 
@@ -26,12 +29,43 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
         a.metadata.autoRenew || false,
         today
       );
+
+      const paidOut = calculateFDInterestPaidOut(
+        Number(a.amount), 
+        Number(a.metadata.interestRate), 
+        new Date(a.startDate), 
+        a.metadata.durationYears || 0,
+        a.metadata.durationMonths || 0,
+        a.metadata.durationDays || 0,
+        a.metadata.interestPayout,
+        a.metadata.compoundingFrequency || "Quarterly",
+        a.metadata.autoRenew || false,
+        today
+      );
+
+      const tds = calculateFDTDS(
+        Number(a.amount), 
+        Number(a.metadata.interestRate), 
+        new Date(a.startDate), 
+        a.metadata.durationYears || 0,
+        a.metadata.durationMonths || 0,
+        a.metadata.durationDays || 0,
+        a.metadata.compoundingFrequency || "Quarterly",
+        a.metadata.autoRenew || false,
+        today
+      );
+
+      // Note: cv and paidOut are ALREADY post-TDS, so we don't subtract TDS again.
+      totalAbsoluteReturns += (cv - Number(a.amount)) + paidOut;
+      return sum + cv;
     }
+    
+    totalAbsoluteReturns += 0; // For stock/mutual funds we aren't tracking live prices yet
     return sum + Number(a.amount);
   }, 0);
 
-  const isProfit = currentTotal >= totalPrincipal;
-  const returnsPercentage = totalPrincipal > 0 ? ((currentTotal - totalPrincipal) / totalPrincipal) * 100 : 0;
+  const isProfit = totalAbsoluteReturns >= 0;
+  const returnsPercentage = totalPrincipal > 0 ? (totalAbsoluteReturns / totalPrincipal) * 100 : 0;
 
   // Generate dynamic chart data based on Asset lifetimes
   let chartData: any[] = [];

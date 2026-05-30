@@ -3,14 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Wallet, ArrowLeftRight, Settings, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Wallet, ArrowLeftRight, User, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 const NAV_ITEMS = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
   { name: "Transactions", href: "/dashboard/transactions", icon: ArrowLeftRight },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  { name: "Profile", href: "/dashboard/profile", icon: User },
 ];
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {

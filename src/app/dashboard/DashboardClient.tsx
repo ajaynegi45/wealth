@@ -14,8 +14,8 @@ export function DashboardClient({ firstName }: { firstName: string }) {
 
   return (
     <div className="w-full h-full">
-      <div className="mb-8 max-w-lg mx-auto md:mx-0 text-center md:text-left">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-3">
+      <div className="mb-8 max-w-lg mx-auto md:mx-0 text-center text-left">
+        <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground mb-3">
           Welcome back,<br />
           {firstName}.
         </h1>

@@ -23,7 +23,7 @@ export function PortfolioClient() {
       return sum + calculateFDCurrentValue(
         Number(a.amount), 
         Number(meta.interestRate), 
-        a.startDate, 
+        new Date(a.startDate), 
         meta.durationYears || 0,
         meta.durationMonths || 0,
         meta.durationDays || 0,
