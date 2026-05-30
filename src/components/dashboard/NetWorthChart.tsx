@@ -1,7 +1,7 @@
 "use client";
 
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, XAxis, Tooltip } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { formatINR } from "@/lib/formatters";
 import { calculateFDCurrentValue } from "@/lib/calculations/fd";
@@ -84,13 +84,13 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
 
       chartData.push({
         month: format(currDate, "MMM yyyy"),
-        netWorth: pointTotal
+        netWorth: Math.round(pointTotal)
       });
       currDate = addMonths(currDate, stepMonths);
     }
   }
 
-  // Hardcode Apple-style hex codes to bypass any Shadcn CSS variable conflicts
+
   const chartColor = isProfit ? "#10B981" : "#EF4444"; 
 
   const chartConfig = {
@@ -101,13 +101,13 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
   } satisfies ChartConfig;
 
   return (
-    <div className="w-full bg-card rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
+    <div className="w-full bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
       <div className="flex flex-row items-start justify-between space-y-0 pb-6 px-8 pt-8">
         <div className="space-y-1">
           <h3 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
             Live Net Worth
           </h3>
-          <div className="text-5xl font-bold text-foreground tracking-tight">
+          <div className="text-xl sm:text-2xl md:text-4xl font-bold text-foreground tracking-tight">
             {formatINR(currentTotal)}
           </div>
         </div>
@@ -131,12 +131,11 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
                 <stop offset="95%" stopColor={chartColor} stopOpacity={0.0} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} stroke="var(--separator)" strokeDasharray="0" opacity={0.3} />
             <XAxis
               dataKey="month"
               tickLine={false}
               axisLine={false}
-              tickMargin={12}
+              tickMargin={8}
               tickFormatter={(value) => value.slice(0, 3) + " '" + value.slice(-2)}
               minTickGap={30}
               padding={{ left: 30, right: 30 }}
