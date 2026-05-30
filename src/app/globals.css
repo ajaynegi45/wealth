@@ -1,23 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  /* iOS 17 Light Theme Colors */
-  --background: #F2F2F7; /* Grouped System Background */
-  --foreground: #000000; /* Label */
+  /* Modern Pure White Light Theme */
+  --background: #FFFFFF; 
+  --foreground: #09090B; /* Zinc 950 */
   
-  --card-bg: #FFFFFF; /* Secondary Grouped Background */
-  --card-foreground: #000000;
+  --card-bg: #F4F4F5; /* Zinc 100 for contrast against white */
+  --card-foreground: #09090B;
   
-  --secondary: #FFFFFF;
-  --secondary-foreground: #3C3C4399; /* Secondary Label */
+  --secondary: #E4E4E7; /* Zinc 200 for badges and secondary elements */
+  --secondary-foreground: #3F3F46; /* Zinc 700 */
   
   --tint: #006C49; /* Premium Wealth Green */
-  --success: #34C759; /* System Green */
-  --warning: #FF9500; /* System Orange */
-  --destructive: #FF3B30; /* System Red */
+  --success: #10B981; /* Emerald 500 */
+  --warning: #F59E0B; /* Amber 500 */
+  --destructive: #EF4444; /* Red 500 */
   
-  --separator: #3C3C434A; /* Separator color with opacity */
-  --gray: #8E8E93; /* System Gray */
+  --separator: #E4E4E7; /* Zinc 200 */
+  --gray: #71717A; /* Zinc 500 */
 }
 
 @theme inline {
@@ -35,7 +35,6 @@
   --color-warning: var(--warning);
   --color-destructive: var(--destructive);
 
-  
   --color-separator: var(--separator);
   --color-gray-ios: var(--gray);
 
@@ -43,33 +42,12 @@
   --font-heading: var(--font-outfit), var(--font-inter), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* iOS 17 Dark Theme Colors */
-    --background: #000000; /* System Background */
-    --foreground: #FFFFFF; /* Label */
-    
-    --card-bg: #1C1C1E; /* Secondary System Background */
-    --card-foreground: #FFFFFF;
-    
-    --secondary: #1C1C1E;
-    --secondary-foreground: #EBEBF599; /* Secondary Label */
-    
-    --tint: #6CF8BB; /* Premium Wealth Green Light */
-    --success: #32D74B; /* System Green */
-    --warning: #FF9F0A; /* System Orange */
-    --destructive: #FF453A; /* System Red */
-    
-    --separator: #545458A6;
-    --gray: #8E8E93;
-  }
-}
-
+/* Base Styles */
 body {
+  font-family: var(--font-sans);
   background-color: var(--background);
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -77,3 +55,31 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   letter-spacing: -0.02em;
 }
+
+/* Hide scrollbar for clean look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--separator);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray);
+}
+
+/* Production Design Schema */
+.flow-gradient-btn {
+    background: linear-gradient(180deg, #059669 0%, #047857 100%);
+    color: white;
+    transition: all 0.1s ease;
+}
+
+.flow-gradient-btn:hover {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+    transform: translateY(-1px);
+}
+
