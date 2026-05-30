@@ -1,36 +1,147 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Introduction
 
-## Getting Started
+A modern wealth tracking platform that helps individuals and families understand, organize, and grow their wealth from a single dashboard.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# Problem
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Today, most investors have their money scattered across multiple platforms:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Mutual Funds (MF Central, AMC Portals)
+- Stocks (Zerodha, Groww, Angel One, Upstox)
+- NPS
+- PPF
+- Fixed Deposits
+- Cash Savings
+- Gold
+- Family Investments
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+As a result, people face several challengesand after there death there family doesn't know about there total investment:
 
-## Learn More
+### 1. No Single Source of Truth
 
-To learn more about Next.js, take a look at the following resources:
+Investments are spread across multiple apps, websites, statements, and spreadsheets.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. Difficult to Understand Total Wealth
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Users know how much money exists in individual accounts but cannot easily answer:
+- What is my total net worth?
+- How much have I invested?
+- What is my current value?
+- How much have I gained?
+- How is my money distributed?
 
-## Deploy on Vercel
+### 3. Family Wealth is Invisible
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Most platforms focus on individual investments.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Users cannot easily track:
+
+- Spouse investments
+- Parents' investments
+- Children's investments
+- Combined family net worth
+
+### 4. Long-Term Goals Are Hard to Track
+
+People create goals like:
+- ₹1 Crore
+- ₹5 Crore
+- ₹10 Crore
+- Financial Independence
+
+But they rarely know:
+- Whether they are on track
+- How much more they need to invest
+- What growth rate is required
+
+### 5. Existing Solutions Are Fragmented
+
+Current solutions generally focus on:
+- Only mutual funds
+- Only stocks
+- Only portfolio tracking
+
+Very few provide a complete wealth tracking experience.
+
+---
+
+# Solution
+
+Provides a single platform where users can:
+- Track all investments
+- Monitor total wealth
+- Understand portfolio growth
+- Track family wealth
+- Plan long-term financial goals
+- View powerful visual analytics
+
+The platform becomes the user's financial command center.
+
+---
+
+# Core Questions We Answer
+
+The entire product is designed around answering five critical questions instantly.
+
+## 1. What do I own?
+
+View all assets in one place.
+
+Examples:
+- Mutual Funds
+- Stocks
+- NPS
+- PPF
+- Fixed Deposits
+- Cash
+- Gold
+- Future Asset Classes
+
+---
+
+## 2. How much did I invest?
+
+Track total invested capital across all accounts.
+
+Examples:
+- SIP contributions
+- Stock purchases
+- PPF deposits
+- NPS contributions
+
+---
+
+## 3. What is it worth today?
+
+View current market value and net worth in real time.
+
+Examples:
+- Current portfolio value
+- Current account value
+- Family wealth value
+
+---
+
+## 4. How much did it grow over the years?
+
+Understand wealth creation over time.
+
+Metrics include:
+- Absolute Returns
+- CAGR
+- XIRR
+- Net Worth Growth
+
+---
+
+## 5. How is it split across asset classes and family members?
+
+Visualize wealth distribution.
+
+Examples:
+- Equity vs Debt
+- Stocks vs Mutual Funds
+- Self vs Spouse
+- Parent vs Child
