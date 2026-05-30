@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aura Wealth | Your financial legacy, unified.</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#858383",
+                        "on-surface": "#191c1d",
+                        "outline": "#747878",
+                        "on-background": "#191c1d",
+                        "on-secondary-fixed": "#002113",
+                        "surface-container-highest": "#e1e3e4",
+                        "inverse-surface": "#2e3132",
+                        "tertiary-fixed-dim": "#ffb783",
+                        "surface": "#f8f9fa",
+                        "secondary": "#006c49",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#474646",
+                        "secondary-container": "#6cf8bb",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-secondary-container": "#00714d",
+                        "surface-variant": "#e1e3e4",
+                        "primary-container": "#1c1b1b",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#000000",
+                        "inverse-primary": "#c8c6c5",
+                        "secondary-fixed-dim": "#4edea3",
+                        "tertiary-container": "#301400",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#cb6a06",
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface-container": "#edeeef",
+                        "on-primary-fixed": "#1c1b1b",
+                        "error": "#ba1a1a",
+                        "background": "#f8f9fa",
+                        "primary-fixed": "#e5e2e1",
+                        "on-tertiary-fixed": "#301400",
+                        "surface-tint": "#5f5e5e",
+                        "outline-variant": "#c4c7c7",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "on-tertiary-fixed-variant": "#713700",
+                        "on-surface-variant": "#444748",
+                        "tertiary-fixed": "#ffdcc5",
+                        "primary": "#000000",
+                        "surface-dim": "#d9dadb",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed": "#6ffbbe",
+                        "violet-accent": "#8e7cc3"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "gutter": "16px",
+                        "container-max": "1200px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "20px",
+                        "section-gap": "48px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "display": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .hero-gradient {
+            background: radial-gradient(circle at top right, rgba(108, 248, 187, 0.15) 0%, rgba(248, 249, 250, 0) 60%),
+                        radial-gradient(circle at bottom left, rgba(142, 124, 195, 0.08) 0%, rgba(248, 249, 250, 0) 50%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-outline-variant/30">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 max-w-container-max mx-auto">
+<div class="flex items-center gap-2 text-primary dark:text-primary-fixed hover:scale-95 transition-transform cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="font-headline-md text-headline-md font-bold tracking-tight text-primary dark:text-primary-fixed">Aura</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-label-md text-on-surface hover:text-primary transition-colors" href="#how-it-works">How it Works</a>
+<a class="font-label-md text-on-surface hover:text-primary transition-colors" href="#insights">Insights</a>
+<a class="font-label-md text-on-surface hover:text-primary transition-colors" href="#security">Security</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="hidden md:block font-label-md text-label-md px-4 py-2 text-primary hover:bg-surface-container-high rounded-full transition-colors">Log In</button>
+<button class="font-label-md text-label-md px-5 py-2.5 bg-primary text-on-primary rounded-full hover:bg-primary/90 transition-all shadow-md hover:shadow-lg">Get Started</button>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 hero-gradient min-h-screen">
+<!-- Hero Section -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-16 md:pt-24 pb-section-gap">
+<div class="flex flex-col lg:flex-row items-center gap-16">
+<div class="w-full lg:w-[55%] flex flex-col items-start text-left">
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm mb-8 border border-outline-variant/50 shadow-sm hover:bg-surface-container transition-colors cursor-pointer">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span> Introducing Family Collaboration <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</div>
+<h1 class="font-display text-display text-primary mb-6 leading-[1.1] tracking-tight">Know exactly what you own.<br/><span class="text-on-surface-variant">And what it's worth.</span></h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-xl leading-relaxed">The ultimate command center for your entire financial life. See your unified financial legacy in one beautifully simple, totally secure dashboard.</p>
+<div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-8">
+<button class="w-full sm:w-auto font-label-md text-label-md px-8 py-4 bg-primary text-on-primary rounded-full hover:scale-105 transition-transform duration-300 shadow-xl shadow-primary/20 flex items-center justify-center gap-2 text-base">
+                        Get Started Free <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="w-full sm:w-auto font-label-md text-label-md px-8 py-4 text-primary bg-surface border-2 border-outline-variant/30 rounded-full hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2 text-base">
+<span class="material-symbols-outlined">play_circle</span> See how it works
+                    </button>
+</div>
+<!-- Social Proof -->
+<div class="flex items-center gap-4 mt-4 p-4 glass-panel rounded-2xl w-fit">
+<div class="flex -space-x-3">
+<img alt="User" class="w-10 h-10 rounded-full border-2 border-surface object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4vCeiQnaJ0us3QvigCbQ04F4xKpxZsT92CHO1hNtyVflyMYlwINs2AEuTjQSWrC8MWOhuTJAEvTdN1HGHuQ5hP8bFqPkRbl3Ce0Jg3fgz5CSB5EdCaJ6mB4UD9vRBWQHgiVci-PxPLN5iMxZ0rUaxKZGoQ3IReLQ4oIzm1kteTKAjK1GV1wa9UHb7Eky8h0woSThvW8GNBUzy4zSbGibVnr-PbOiBQSN4K9dMAQm9H5vQrm77wxC0ME8dx2dYl86Bmz8kU7M4qJ0"/>
+<img alt="User" class="w-10 h-10 rounded-full border-2 border-surface object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4vCeiQnaJ0us3QvigCbQ04F4xKpxZsT92CHO1hNtyVflyMYlwINs2AEuTjQSWrC8MWOhuTJAEvTdN1HGHuQ5hP8bFqPkRbl3Ce0Jg3fgz5CSB5EdCaJ6mB4UD9vRBWQHgiVci-PxPLN5iMxZ0rUaxKZGoQ3IReLQ4oIzm1kteTKAjK1GV1wa9UHb7Eky8h0woSThvW8GNBUzy4zSbGibVnr-PbOiBQSN4K9dMAQm9H5vQrm77wxC0ME8dx2dYl86Bmz8kU7M4qJ0"/>
+<img alt="User" class="w-10 h-10 rounded-full border-2 border-surface object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4vCeiQnaJ0us3QvigCbQ04F4xKpxZsT92CHO1hNtyVflyMYlwINs2AEuTjQSWrC8MWOhuTJAEvTdN1HGHuQ5hP8bFqPkRbl3Ce0Jg3fgz5CSB5EdCaJ6mB4UD9vRBWQHgiVci-PxPLN5iMxZ0rUaxKZGoQ3IReLQ4oIzm1kteTKAjK1GV1wa9UHb7Eky8h0woSThvW8GNBUzy4zSbGibVnr-PbOiBQSN4K9dMAQm9H5vQrm77wxC0ME8dx2dYl86Bmz8kU7M4qJ0"/>
+<div class="w-10 h-10 rounded-full border-2 border-surface bg-surface-container-high flex items-center justify-center font-label-sm text-on-surface">+</div>
+</div>
+<p class="font-label-sm text-on-surface-variant leading-tight">Join <span class="font-bold text-primary">50,000+</span> families<br/>securing their legacy</p>
+</div>
+</div>
+<div class="w-full lg:w-[45%] flex justify-center relative mt-12 lg:mt-0">
+<!-- Abstract decorative elements behind phone -->
+<div class="absolute inset-0 bg-secondary-container/30 blur-[80px] rounded-full w-96 h-96 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10"></div>
+<div class="absolute inset-0 bg-primary/5 blur-[100px] rounded-full w-full h-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10"></div>
+<div class="relative w-[320px] h-[640px] bg-surface rounded-[48px] border-[12px] border-primary shadow-[0_30px_60px_rgba(0,0,0,0.15)] overflow-hidden group hover:-translate-y-2 transition-transform duration-500">
+<!-- Phone Notch -->
+<div class="absolute top-0 inset-x-0 h-7 bg-primary rounded-b-2xl w-36 mx-auto z-20"></div>
+<!-- Mockup Content -->
+<div class="p-6 pt-14 h-full bg-surface-container-lowest flex flex-col gap-6 relative">
+<!-- Decorative gradient in phone -->
+<div class="absolute top-0 right-0 w-48 h-48 bg-secondary-container/20 rounded-full blur-3xl -z-0"></div>
+<div class="relative z-10 flex justify-between items-center">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant font-medium tracking-wide">Total Net Worth</p>
+<p class="font-headline-lg text-headline-lg text-primary tracking-tight">$2,450,890</p>
+</div>
+<div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-2xl">trending_up</span>
+</div>
+</div>
+<!-- Graph Placeholder -->
+<div class="h-40 w-full relative z-10 rounded-2xl overflow-hidden shadow-sm bg-surface flex items-end">
+<svg class="w-full h-full stroke-secondary stroke-2 fill-none stroke-[3px]" preserveaspectratio="none" viewbox="0 0 100 40">
+<path d="M0 40 Q 10 30, 20 35 T 40 20 T 60 25 T 80 5 T 100 10"></path>
+</svg>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent"></div>
+</div>
+<div class="flex flex-col gap-3 relative z-10">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest font-semibold mb-1">Top Assets</p>
+<div class="bg-surface p-4 rounded-2xl flex justify-between items-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 hover:border-outline-variant/50 transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary"><span class="material-symbols-outlined">home</span></div>
+<div>
+<p class="font-label-md text-label-md text-primary font-semibold">Real Estate</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Primary Residence</p>
+</div>
+</div>
+<p class="font-label-md text-label-md text-primary font-semibold">$1.2M</p>
+</div>
+<div class="bg-surface p-4 rounded-2xl flex justify-between items-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 hover:border-outline-variant/50 transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary"><span class="material-symbols-outlined">show_chart</span></div>
+<div>
+<p class="font-label-md text-label-md text-primary font-semibold">Equities</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Vanguard S&amp;P 500</p>
+</div>
+</div>
+<p class="font-label-md text-label-md text-primary font-semibold">$850k</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- How It Works Section -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-16" id="how-it-works">
+<div class="text-center mb-16">
+<p class="font-label-sm text-secondary font-bold uppercase tracking-widest mb-3">Simple Setup</p>
+<h2 class="font-display text-4xl text-primary mb-6">How Aura brings it all together</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+<!-- Connecting Line -->
+<div class="hidden md:block absolute top-12 left-[15%] right-[15%] h-[2px] bg-outline-variant/30 z-0"></div>
+<!-- Step 1 -->
+<div class="flex flex-col items-center text-center relative z-10 group">
+<div class="w-24 h-24 rounded-full bg-surface border-4 border-surface-container-lowest shadow-sm flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-4xl">link</span>
+</div>
+<h3 class="font-headline-md text-xl text-primary mb-3 font-bold">1. Securely Connect</h3>
+<p class="font-body-md text-on-surface-variant max-w-xs">Link your banks, brokerages, crypto, and real estate securely in seconds.</p>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col items-center text-center relative z-10 group">
+<div class="w-24 h-24 rounded-full bg-secondary-container border-4 border-surface-container-lowest shadow-sm flex items-center justify-center mb-6 text-on-secondary-container group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-4xl">auto_awesome</span>
+</div>
+<h3 class="font-headline-md text-xl text-primary mb-3 font-bold">2. Aura Organizes</h3>
+<p class="font-body-md text-on-surface-variant max-w-xs">Our engine categorizes assets, calculates basis, and tracks historical values automatically.</p>
+</div>
+<!-- Step 3 -->
+<div class="flex flex-col items-center text-center relative z-10 group">
+<div class="w-24 h-24 rounded-full bg-primary border-4 border-surface-container-lowest shadow-xl shadow-primary/20 flex items-center justify-center mb-6 text-on-primary group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-4xl">monitoring</span>
+</div>
+<h3 class="font-headline-md text-xl text-primary mb-3 font-bold">3. See Your Legacy</h3>
+<p class="font-body-md text-on-surface-variant max-w-xs">Get a clear, unified view of your entire financial life and collaborate with your family.</p>
+</div>
+</div>
+</section>
+<!-- Insights at a glance -->
+<section class="bg-surface-container-low py-section-gap border-y border-outline-variant/30" id="insights">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="text-center mb-16">
+<p class="font-label-sm text-secondary font-bold uppercase tracking-widest mb-3">Answers in Seconds</p>
+<h2 class="font-display text-4xl text-primary mb-6">Insights at a glance</h2>
+<p class="font-body-lg text-on-surface-variant max-w-2xl mx-auto">Stop guessing. We crunch the numbers so you can instantly see the metrics that matter most.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Question 1 -->
+<div class="glass-panel rounded-3xl p-8 bg-surface flex flex-col hover:shadow-lg transition-shadow border border-outline-variant/20">
+<h3 class="font-label-md text-on-surface-variant font-bold uppercase tracking-wider mb-6">Invested vs. Current Worth</h3>
+<div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/20 mt-auto">
+<div class="flex justify-between items-end mb-2">
+<span class="font-body-sm text-on-surface-variant">Cost Basis</span>
+<span class="font-label-md text-primary">$1,800,000</span>
+</div>
+<div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden mb-5">
+<div class="h-full bg-violet-accent w-[60%] rounded-full"></div>
+</div>
+<div class="flex justify-between items-end mb-2">
+<span class="font-body-sm text-on-surface-variant">Current Value</span>
+<span class="font-label-md text-secondary text-lg font-bold">$2,450,890</span>
+</div>
+<div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[85%] rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Question 2 -->
+<div class="glass-panel rounded-3xl p-8 bg-surface flex flex-col hover:shadow-lg transition-shadow border border-outline-variant/20">
+<h3 class="font-label-md text-on-surface-variant font-bold uppercase tracking-wider mb-6">How much did it grow?</h3>
+<div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/20 mt-auto flex flex-col items-center relative overflow-hidden min-h-[160px]">
+<div class="flex items-center gap-2 mb-2 z-10">
+<span class="material-symbols-outlined text-secondary">trending_up</span>
+<span class="font-headline-md text-secondary font-bold">+36.2%</span>
+</div>
+<span class="font-label-sm text-on-surface-variant z-10">All-Time Return</span>
+<div class="absolute bottom-0 left-0 w-full h-24 z-0">
+<svg class="w-full h-full stroke-secondary stroke-2 fill-none stroke-[3px]" preserveaspectratio="none" viewbox="0 0 100 40">
+<path d="M0 40 Q 20 35, 40 25 T 70 15 T 100 5"></path>
+</svg>
+<div class="absolute inset-0 bg-gradient-to-t from-secondary/10 to-transparent"></div>
+</div>
+</div>
+</div>
+<!-- Question 3 -->
+<div class="glass-panel rounded-3xl p-8 bg-surface flex flex-col hover:shadow-lg transition-shadow border border-outline-variant/20">
+<h3 class="font-label-md text-on-surface-variant font-bold uppercase tracking-wider mb-6">Asset Distribution</h3>
+<div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/20 mt-auto flex items-center gap-6">
+<div class="w-16 h-16 rounded-full border-8 border-primary border-t-secondary border-l-violet-accent transform rotate-45 shrink-0"></div>
+<div class="flex flex-col gap-3 w-full">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-primary"></span><span class="font-label-sm text-on-surface-variant">Equities</span></div>
+<span class="font-label-md text-primary">50%</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-secondary"></span><span class="font-label-sm text-on-surface-variant">Real Estate</span></div>
+<span class="font-label-md text-primary">35%</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-violet-accent"></span><span class="font-label-sm text-on-surface-variant">Crypto</span></div>
+<span class="font-label-md text-primary">15%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Trust & Security Banner -->
+<section class="bg-primary text-on-primary py-12 border-b border-primary-fixed-dim/20" id="security">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-4 text-secondary">
+<span class="material-symbols-outlined text-3xl">shield_locked</span>
+<span class="font-label-sm font-bold uppercase tracking-widest">Why Trust Aura?</span>
+</div>
+<h3 class="font-headline-lg text-3xl mb-4">Bank-Level Security. Absolute Privacy.</h3>
+<p class="font-body-md text-inverse-surface/80 text-gray-300 max-w-xl">Your financial data is yours alone. We connect with read-only access, meaning funds can never be moved. We use military-grade AES-256 encryption and never sell your personal information.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-6 w-full md:w-auto">
+<div class="flex items-center gap-3 bg-surface-container-highest/10 px-6 py-4 rounded-2xl border border-outline/20">
+<span class="material-symbols-outlined text-secondary text-2xl">lock</span>
+<span class="font-label-md text-on-primary">AES-256 Encryption</span>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-highest/10 px-6 py-4 rounded-2xl border border-outline/20">
+<span class="material-symbols-outlined text-secondary text-2xl">visibility_off</span>
+<span class="font-label-md text-on-primary">Read-Only Access</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Bento Grid -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-section-gap" id="features">
+<div class="text-center mb-16">
+<p class="font-label-sm text-secondary font-bold uppercase tracking-widest mb-3">Complete Visibility</p>
+<h2 class="font-display text-4xl md:text-5xl text-primary mb-6">Comprehensive Wealth Control</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">A unified view of everything you own and owe, designed with absolute clarity and precision.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[minmax(300px,_auto)]">
+<!-- All Assets Card -->
+<div class="md:col-span-8 glass-panel rounded-[32px] p-10 flex flex-col justify-between group hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)] transition-all duration-500 relative overflow-hidden bg-surface">
+<div class="relative z-10 w-full md:w-3/4">
+<div class="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-3xl text-primary">pie_chart</span>
+</div>
+<h3 class="font-headline-md text-3xl text-primary mb-4 font-bold">All Your Assets. One Ledger.</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant">From traditional equities to digital currencies, real estate, and precious metals. Track your entire portfolio across all institutions in beautifully organized detail.</p>
+</div>
+<div class="flex gap-3 mt-10 z-10 flex-wrap">
+<span class="px-4 py-2 bg-surface-container-high rounded-full font-label-md text-primary shadow-sm hover:bg-outline-variant/30 transition-colors cursor-default border border-outline-variant/20">Stocks &amp; Bonds</span>
+<span class="px-4 py-2 bg-surface-container-high rounded-full font-label-md text-primary shadow-sm hover:bg-outline-variant/30 transition-colors cursor-default border border-outline-variant/20">Crypto</span>
+<span class="px-4 py-2 bg-surface-container-high rounded-full font-label-md text-primary shadow-sm hover:bg-outline-variant/30 transition-colors cursor-default border border-outline-variant/20">Real Estate</span>
+<span class="px-4 py-2 bg-surface-container-high rounded-full font-label-md text-primary shadow-sm hover:bg-outline-variant/30 transition-colors cursor-default border border-outline-variant/20">Private Equity</span>
+</div>
+<!-- Decorative Background Element -->
+<div class="absolute -bottom-20 -right-20 w-96 h-96 bg-gradient-to-br from-surface-container to-surface-container-lowest rounded-full opacity-60 group-hover:scale-105 transition-transform duration-700"></div>
+</div>
+<!-- Family Net Worth Card -->
+<div class="md:col-span-4 glass-panel rounded-[32px] p-10 flex flex-col justify-between group hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)] transition-all duration-500 bg-gradient-to-b from-surface to-surface-container-low border border-outline-variant/30 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
+<div class="relative z-10">
+<div class="w-14 h-14 rounded-2xl bg-secondary/10 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-3xl text-secondary">family_history</span>
+</div>
+<h3 class="font-headline-md text-2xl text-primary mb-3 font-bold">Collaborative Tracking</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Invite your partner, financial advisor, or CPA to view or manage shared goals with custom permission levels.</p>
+</div>
+<div class="flex items-center justify-between mt-8 relative z-10 bg-surface-container-lowest p-4 rounded-2xl shadow-sm">
+<div class="flex -space-x-3">
+<div class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md text-base border-2 border-surface-container-lowest z-30 shadow-md">JD</div>
+<div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-md text-base border-2 border-surface-container-lowest z-20 shadow-md">MD</div>
+<div class="w-12 h-12 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-label-md border-2 border-surface-container-lowest z-10 hover:bg-outline-variant/30 cursor-pointer transition-colors"><span class="material-symbols-outlined">add</span></div>
+</div>
+</div>
+</div>
+<!-- Modern Design Card -->
+<div class="md:col-span-12 glass-panel rounded-[32px] p-10 flex flex-col md:flex-row items-center justify-between gap-10 hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)] transition-all duration-500 bg-surface border border-outline-variant/30">
+<div class="w-full md:w-[55%]">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-3xl text-primary">devices</span>
+</div>
+<h3 class="font-headline-md text-2xl text-primary mb-3 font-bold">Built for Modern Life</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">An iOS-style aesthetic that brings calm to complexity. Fully responsive, functioning flawlessly from your mobile device to a massive desktop command center.</p>
+</div>
+<div class="w-full md:w-[45%] flex justify-center items-center gap-6 opacity-80 group-hover:opacity-100 transition-opacity duration-500">
+<div class="p-4 bg-surface-container rounded-2xl shadow-inner flex flex-col items-center gap-2 transform -rotate-6">
+<span class="material-symbols-outlined text-5xl text-on-surface-variant">smartphone</span>
+</div>
+<div class="p-5 bg-surface-container rounded-3xl shadow-inner flex flex-col items-center gap-2 transform scale-110 z-10 border border-outline-variant/20 bg-surface">
+<span class="material-symbols-outlined text-6xl text-primary">tablet_mac</span>
+</div>
+<div class="p-4 bg-surface-container rounded-2xl shadow-inner flex flex-col items-center gap-2 transform rotate-6">
+<span class="material-symbols-outlined text-5xl text-on-surface-variant">laptop_mac</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 border-t border-outline-variant/30 bg-surface max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2 font-headline-md text-headline-md font-bold text-primary opacity-90 hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span> Aura
+        </div>
+<div class="font-body-sm text-sm text-on-surface-variant opacity-80 text-center md:text-left">
+            © 2024 Aura Wealth Management. All rights reserved.
+        </div>
+<div class="flex gap-6 font-body-sm text-sm font-medium">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Security</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</footer>
+</body></html>

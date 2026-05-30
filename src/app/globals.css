@@ -1,26 +1,79 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* iOS 17 Light Theme Colors */
+  --background: #F2F2F7; /* Grouped System Background */
+  --foreground: #000000; /* Label */
+  
+  --card-bg: #FFFFFF; /* Secondary Grouped Background */
+  --card-foreground: #000000;
+  
+  --secondary: #FFFFFF;
+  --secondary-foreground: #3C3C4399; /* Secondary Label */
+  
+  --tint: #006C49; /* Premium Wealth Green */
+  --success: #34C759; /* System Green */
+  --warning: #FF9500; /* System Orange */
+  --destructive: #FF3B30; /* System Red */
+  
+  --separator: #3C3C434A; /* Separator color with opacity */
+  --gray: #8E8E93; /* System Gray */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  
+  --color-card: var(--card-bg);
+  --color-card-foreground: var(--card-foreground);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-tint: var(--tint);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-destructive: var(--destructive);
+
+  
+  --color-separator: var(--separator);
+  --color-gray-ios: var(--gray);
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-heading: var(--font-outfit), var(--font-inter), system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* iOS 17 Dark Theme Colors */
+    --background: #000000; /* System Background */
+    --foreground: #FFFFFF; /* Label */
+    
+    --card-bg: #1C1C1E; /* Secondary System Background */
+    --card-foreground: #FFFFFF;
+    
+    --secondary: #1C1C1E;
+    --secondary-foreground: #EBEBF599; /* Secondary Label */
+    
+    --tint: #6CF8BB; /* Premium Wealth Green Light */
+    --success: #32D74B; /* System Green */
+    --warning: #FF9F0A; /* System Orange */
+    --destructive: #FF453A; /* System Red */
+    
+    --separator: #545458A6;
+    --gray: #8E8E93;
   }
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
