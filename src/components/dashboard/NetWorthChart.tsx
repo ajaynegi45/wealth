@@ -5,7 +5,7 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { formatINR } from "@/lib/formatters";
 import { calculateFDCurrentValue } from "@/lib/calculations/fd";
-import { addMonths, format, max, min, differenceInMonths, isBefore, isAfter } from "date-fns";
+import { addMonths, addDays, addYears, format, max, min, differenceInMonths, differenceInDays, differenceInYears, isBefore, isAfter } from "date-fns";
 
 export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
   const today = new Date();
@@ -39,7 +39,7 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
   if (assets.length === 0) {
     chartData = Array.from({ length: 6 }).map((_, i) => {
       const d = addMonths(today, i - 5);
-      return { month: format(d, "MMM yyyy"), netWorth: 0 };
+      return { timeLabel: format(d, "MMM yyyy"), netWorth: 0 };
     });
   } else {
     const startDates = assets.map((a) => new Date(a.startDate));
@@ -59,10 +59,36 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
     let latest = max(endDates);
     if (isBefore(latest, today)) latest = today;
 
-    const totalMonths = differenceInMonths(latest, earliest) || 1;
-    const stepMonths = Math.max(1, Math.floor(totalMonths / 24)); 
+    const totalDays = Math.max(1, differenceInDays(latest, earliest));
+    
+    let granularity: "days" | "months" | "years" = "months";
+    if (totalDays <= 31) {
+      granularity = "days";
+    } else if (totalDays > 365 * 3) {
+      granularity = "years";
+    } else {
+      granularity = "months";
+    }
 
-    let currDate = addMonths(earliest, -stepMonths);
+    let stepDays = 1;
+    let stepMonths = 1;
+    let stepYears = 1;
+
+    if (granularity === "days") {
+      stepDays = Math.max(1, Math.floor(totalDays / 14));
+    } else if (granularity === "months") {
+      const totalMonths = Math.max(1, differenceInMonths(latest, earliest));
+      stepMonths = Math.max(1, Math.floor(totalMonths / 24)); 
+    } else if (granularity === "years") {
+      const totalYears = Math.max(1, differenceInYears(latest, earliest));
+      stepYears = Math.max(1, Math.floor(totalYears / 10));
+    }
+
+    let currDate = new Date(earliest);
+    if (granularity === "days") currDate = addDays(currDate, -stepDays);
+    if (granularity === "months") currDate = addMonths(currDate, -stepMonths);
+    if (granularity === "years") currDate = addYears(currDate, -stepYears);
+
     while (currDate <= latest) {
       const pointTotal = assets.reduce((sum, a) => {
         if (currDate < new Date(a.startDate)) return sum; 
@@ -84,11 +110,19 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
         return sum + Number(a.amount);
       }, 0);
 
+      let label = "";
+      if (granularity === "days") label = format(currDate, "MMM dd");
+      if (granularity === "months") label = format(currDate, "MMM yy");
+      if (granularity === "years") label = format(currDate, "yyyy");
+
       chartData.push({
-        month: format(currDate, "MMM yyyy"),
+        timeLabel: label,
         netWorth: Math.round(pointTotal)
       });
-      currDate = addMonths(currDate, stepMonths);
+
+      if (granularity === "days") currDate = addDays(currDate, stepDays);
+      else if (granularity === "months") currDate = addMonths(currDate, stepMonths);
+      else if (granularity === "years") currDate = addYears(currDate, stepYears);
     }
   }
 
@@ -134,11 +168,11 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
               </linearGradient>
             </defs>
             <XAxis
-              dataKey="month"
+              dataKey="timeLabel"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3) + " '" + value.slice(-2)}
+              tickFormatter={(value) => value}
               minTickGap={30}
               padding={{ left: 10, right: 25 }}
               className="text-muted-foreground text-xs font-medium"
