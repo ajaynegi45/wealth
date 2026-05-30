@@ -18,8 +18,12 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
         Number(a.amount), 
         Number(a.metadata.interestRate), 
         new Date(a.startDate), 
+        a.metadata.durationYears || 0,
+        a.metadata.durationMonths || 0,
+        a.metadata.durationDays || 0,
         a.metadata.interestPayout,
         a.metadata.compoundingFrequency || "Quarterly",
+        a.metadata.autoRenew || false,
         today
       );
     }
@@ -64,19 +68,17 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
         if (currDate < new Date(a.startDate)) return sum; 
         
         if (a.type === "FD" && a.metadata) {
-          const maturityDate = new Date(a.startDate);
-          maturityDate.setFullYear(maturityDate.getFullYear() + (a.metadata.durationYears || 0));
-          maturityDate.setMonth(maturityDate.getMonth() + (a.metadata.durationMonths || 0));
-          maturityDate.setDate(maturityDate.getDate() + (a.metadata.durationDays || 0));
-          
-          const evalDate = currDate > maturityDate && !a.metadata.autoRenew ? maturityDate : currDate;
           return sum + calculateFDCurrentValue(
             Number(a.amount), 
             Number(a.metadata.interestRate), 
             new Date(a.startDate), 
+            a.metadata.durationYears || 0,
+            a.metadata.durationMonths || 0,
+            a.metadata.durationDays || 0,
             a.metadata.interestPayout, 
             a.metadata.compoundingFrequency || "Quarterly",
-            evalDate
+            a.metadata.autoRenew || false,
+            currDate
           );
         }
         return sum + Number(a.amount);

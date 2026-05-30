@@ -1,7 +1,7 @@
 import { getUserAssets } from "@/app/actions/assets";
 import { AddAssetModal } from "@/components/portfolio/AddAssetModal";
 import { DeleteAssetButton } from "@/components/portfolio/DeleteAssetButton";
-import { calculateFDCurrentValue, calculateFDMaturityValue } from "@/lib/calculations/fd";
+import { calculateFDCurrentValue, calculateFDMaturityValue, calculateFDInterestPaidOut, getFDMaturityDate, calculateFDTDS } from "@/lib/calculations/fd";
 import { formatINR } from "@/lib/formatters";
 import { format } from "date-fns";
 import { Wallet, TrendingUp } from "lucide-react";
@@ -17,8 +17,12 @@ export default async function PortfolioPage() {
         Number(a.amount), 
         Number(meta.interestRate), 
         a.startDate, 
+        meta.durationYears || 0,
+        meta.durationMonths || 0,
+        meta.durationDays || 0,
         meta.interestPayout,
-        meta.compoundingFrequency || "Quarterly"
+        meta.compoundingFrequency || "Quarterly",
+        meta.autoRenew || false
       );
     }
     return sum + Number(a.amount);
@@ -73,18 +77,61 @@ export default async function PortfolioPage() {
             let returns = 0;
             let maturityValue = null;
 
+            let paidOutInterest = 0;
+            let tdsAmount = 0;
+            let isMatured = false;
+            let isAutoRenewing = false;
+
             if (asset.type === "FD") {
+              const maturityDate = getFDMaturityDate(
+                asset.startDate,
+                meta.durationYears || 0,
+                meta.durationMonths || 0,
+                meta.durationDays || 0
+              );
+              isMatured = new Date() >= maturityDate;
+              isAutoRenewing = isMatured && (meta.autoRenew === true);
+
               currentValue = calculateFDCurrentValue(
                 Number(asset.amount), 
                 Number(meta.interestRate), 
                 asset.startDate, 
+                meta.durationYears || 0,
+                meta.durationMonths || 0,
+                meta.durationDays || 0,
                 meta.interestPayout,
-                meta.compoundingFrequency || "Quarterly"
+                meta.compoundingFrequency || "Quarterly",
+                meta.autoRenew || false
               );
-              returns = currentValue - Number(asset.amount);
+              
+              paidOutInterest = calculateFDInterestPaidOut(
+                Number(asset.amount), 
+                Number(meta.interestRate), 
+                asset.startDate, 
+                meta.durationYears || 0,
+                meta.durationMonths || 0,
+                meta.durationDays || 0,
+                meta.interestPayout,
+                meta.compoundingFrequency || "Quarterly",
+                meta.autoRenew || false
+              );
+
+              tdsAmount = calculateFDTDS(
+                Number(asset.amount), 
+                Number(meta.interestRate), 
+                asset.startDate, 
+                meta.durationYears || 0,
+                meta.durationMonths || 0,
+                meta.durationDays || 0,
+                meta.compoundingFrequency || "Quarterly",
+                meta.autoRenew || false
+              );
+
+              returns = currentValue - Number(asset.amount) + paidOutInterest;
               maturityValue = calculateFDMaturityValue(
                 Number(asset.amount),
                 Number(meta.interestRate),
+                asset.startDate,
                 meta.durationYears || 0,
                 meta.durationMonths || 0,
                 meta.durationDays || 0,
@@ -93,8 +140,12 @@ export default async function PortfolioPage() {
               );
             }
 
+            const cardClasses = isMatured && !isAutoRenewing
+              ? "bg-warning/10 border-warning/50 shadow-[0_0_15px_rgba(245,158,11,0.1)]"
+              : "bg-card/90 border-separator/30";
+
             return (
-              <div key={asset.id} className="bg-card/90 backdrop-blur-xl border border-separator/30 p-5 rounded-3xl shadow-sm flex flex-col transition-transform hover:scale-[1.01]">
+              <div key={asset.id} className={`${cardClasses} backdrop-blur-xl border p-5 rounded-xl shadow-sm flex flex-col transition-transform hover:scale-[1.01]`}>
                 <div className="flex justify-between items-start mb-5">
                   <div>
                     <div className="text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">{asset.type}</div>
@@ -107,7 +158,7 @@ export default async function PortfolioPage() {
                     
                     {asset.type === "FD" && (
                       <p className="text-xs text-muted-foreground mt-1">
-                        {meta.interestPayout} Payout • {meta.compoundingFrequency} Compounding • {meta.interestRate}% p.a.
+                        {meta.interestPayout} • {meta.compoundingFrequency} • {meta.interestRate}% p.a.
                       </p>
                     )}
                     {(asset.type === "Stock" || asset.type === "Mutual Fund") && meta.ticker && (
@@ -116,7 +167,15 @@ export default async function PortfolioPage() {
                       </p>
                     )}
                   </div>
-                  <DeleteAssetButton id={asset.id as number} type={asset.type as any} />
+                  <div className="flex flex-col items-end gap-2">
+                    <DeleteAssetButton id={asset.id as number} type={asset.type as any} />
+                    {isMatured && !isAutoRenewing && (
+                      <span className="bg-warning/20 text-warning text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-widest">Matured</span>
+                    )}
+                    {isAutoRenewing && (
+                      <span className="bg-tint/10 text-tint text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-widest">Auto-Renewing</span>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="space-y-2 mb-6 flex-1">
@@ -130,10 +189,24 @@ export default async function PortfolioPage() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground font-medium">Returns</span>
-                    <span className={`font-semibold ${returns >= 0 ? "text-success" : "text-destructive"}`}>
-                      {returns >= 0 ? "+" : ""}{formatINR(returns)}
+                    <span className={`font-semibold ${returns + tdsAmount >= 0 ? "text-success" : "text-destructive"}`}>
+                      {returns + tdsAmount >= 0 ? "+" : ""}{formatINR(returns + tdsAmount)}
                     </span>
                   </div>
+                  {paidOutInterest > 0 && (
+                    <div className="flex justify-between text-sm pt-2 border-t border-separator/20 mt-2">
+                      <span className="text-muted-foreground font-medium">Interest Paid Out</span>
+                      <span className="font-semibold text-tint">{formatINR(paidOutInterest)}</span>
+                    </div>
+                  )}
+                  {asset.type === "FD" && (
+                    <div className="flex justify-between text-sm pt-2 border-t border-separator/20 mt-2">
+                      <span className="text-muted-foreground font-medium">TDS Deducted</span>
+                      <span className={`font-semibold ${tdsAmount > 0 ? "text-destructive" : "text-muted-foreground"}`}>
+                        {tdsAmount > 0 ? "-" : ""}{formatINR(tdsAmount)}
+                      </span>
+                    </div>
+                  )}
                   {maturityValue !== null && (
                     <div className="flex justify-between text-sm pt-2 border-t border-separator/20 mt-2">
                       <span className="text-muted-foreground font-medium">Maturity Value</span>
