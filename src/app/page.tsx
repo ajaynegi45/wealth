@@ -1,9 +1,16 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { auth } from "@/../auth";
+import { redirect } from "next/navigation";
 import { ArrowRight, PlayCircle, TrendingUp, Home, LineChart, Link as LinkIcon, Sparkles, ShieldCheck, Lock, PieChart, Users } from "lucide-react";
 import { Suspense } from "react";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth();
+  if (session) {
+    redirect("/dashboard");
+  }
+
   return (
     <>
       <Suspense fallback={<header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-separator/50 h-16"></header>}>

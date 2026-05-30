@@ -1,0 +1,1 @@
+ALTER TABLE "assets" ADD COLUMN "bank_name" varchar(255) DEFAULT '';
