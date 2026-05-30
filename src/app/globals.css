@@ -135,6 +135,13 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateY(-1px);
 }
 
+.recharts-wrapper,
+.recharts-surface,
+.recharts-wrapper *,
+.recharts-surface * {
+  outline: none !important;
+}
+
 .dark {
 
   --background: oklch(0.145 0 0);
