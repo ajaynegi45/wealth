@@ -1,7 +1,7 @@
 import { getUserAssets } from "@/app/actions/assets";
 import { AddAssetModal } from "@/components/portfolio/AddAssetModal";
 import { DeleteAssetButton } from "@/components/portfolio/DeleteAssetButton";
-import { calculateFDCurrentValue, calculateFDMaturityValue } from "@/lib/calculations";
+import { calculateFDCurrentValue, calculateFDMaturityValue } from "@/lib/calculations/fd";
 import { formatINR } from "@/lib/formatters";
 import { format } from "date-fns";
 import { Wallet, TrendingUp } from "lucide-react";

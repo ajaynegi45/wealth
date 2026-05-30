@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/../auth";
 import { NetWorthChart } from "@/components/dashboard/NetWorthChart";
 import { getUserAssets } from "@/app/actions/assets";
-import { calculateFDCurrentValue } from "@/lib/calculations";
+import { calculateFDCurrentValue } from "@/lib/calculations/fd";
 
 export default async function DashboardPage() {
   const session = await auth();

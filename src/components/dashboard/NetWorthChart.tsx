@@ -4,7 +4,7 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, Tooltip } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { formatINR } from "@/lib/formatters";
-import { calculateFDCurrentValue } from "@/lib/calculations";
+import { calculateFDCurrentValue } from "@/lib/calculations/fd";
 import { addMonths, format, max, min, differenceInMonths, isBefore, isAfter } from "date-fns";
 
 export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
