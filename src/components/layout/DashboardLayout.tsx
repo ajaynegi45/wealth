@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Wallet, ArrowLeftRight, User, LogOut, ChevronLeft, ChevronRight, Calculator } from "lucide-react";
+import { LayoutDashboard, Wallet, ArrowLeftRight, User, LogOut, ChevronLeft, ChevronRight, Calculator, Plus } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { AddAssetModal } from "@/components/portfolio/AddAssetModal";
+import { useUIStore } from "@/store/useUIStore";
 
 const NAV_ITEMS = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -17,6 +19,9 @@ const NAV_ITEMS = [
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const setAddAssetModalOpen = useUIStore((state) => state.setAddAssetModalOpen);
+  
+  const MOBILE_NAV_ITEMS = NAV_ITEMS.filter(item => item.name !== "Transactions");
 
   return (
     <div className="flex min-h-screen bg-background relative">
@@ -81,27 +86,52 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
+      
+      <AddAssetModal hideTrigger={true} />
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 w-full z-50 bg-card/85 backdrop-blur-2xl border-t border-separator/30 pb-[env(safe-area-inset-bottom)]">
-        <div className="flex items-center justify-around h-16 px-2">
-          {NAV_ITEMS.map((item) => {
+      <nav 
+        className="md:hidden fixed bottom-0 w-full z-40 bg-card/85 backdrop-blur-2xl border-t border-separator/30 pb-[env(safe-area-inset-bottom)]"
+        style={{
+          maskImage: 'radial-gradient(circle at 50% 0px, transparent 36px, black 37px)',
+          WebkitMaskImage: 'radial-gradient(circle at 50% 0px, transparent 36px, black 37px)'
+        }}
+      >
+        <div className="flex items-center justify-between h-16 px-2">
+          {MOBILE_NAV_ITEMS.map((item, index) => {
             const isActive = pathname === item.href;
+            const isMiddle = index === 2; // Insert space before 3rd item (index 2)
+            
             return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                  isActive ? "text-tint" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <item.icon className={`w-6 h-6 ${isActive ? "text-tint fill-tint/10" : ""}`} />
-                <span className="text-[10px] font-medium">{item.name}</span>
-              </Link>
+              <Fragment key={item.name}>
+                {isMiddle && <div className="w-20 h-full flex-shrink-0" aria-hidden="true" />}
+                <Link
+                  href={item.href}
+                  className="relative flex flex-col items-center justify-center w-full h-full transition-colors group"
+                >
+                  {isActive && (
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-tint rounded-b-full shadow-[0_2px_8px_rgba(var(--tint),0.5)]" />
+                  )}
+                  <item.icon className={`w-6 h-6 transition-all duration-300 ${isActive ? "text-tint scale-110" : "text-muted-foreground hover:text-foreground"}`} />
+                </Link>
+              </Fragment>
             );
           })}
         </div>
       </nav>
+
+      {/* FAB - Placed outside the nav so it doesn't get masked */}
+      <div 
+        className="md:hidden fixed left-1/2 -translate-x-1/2 z-[50]"
+        style={{ bottom: 'calc(36px + env(safe-area-inset-bottom))' }}
+      >
+        <button
+          onClick={() => setAddAssetModalOpen(true)}
+          className="w-14 h-14 bg-tint text-background rounded-full flex items-center justify-center shadow-[0_8px_30px_rgb(var(--tint-rgb),0.4)] hover:scale-105 active:scale-95 transition-all"
+        >
+          <Plus className="w-6 h-6 stroke-[2.5]" />
+        </button>
+      </div>
     </div>
   );
 }

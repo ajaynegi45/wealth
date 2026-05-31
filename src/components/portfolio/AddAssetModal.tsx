@@ -6,9 +6,11 @@ import { toast } from "sonner";
 import { Plus, X, ChevronDown } from "lucide-react";
 
 import { useAssetStore } from "@/store/useAssetStore";
+import { useUIStore } from "@/store/useUIStore";
 
-export function AddAssetModal() {
-  const [isOpen, setIsOpen] = useState(false);
+export function AddAssetModal({ hideTrigger = false }: { hideTrigger?: boolean }) {
+  const isOpen = useUIStore((state) => state.isAddAssetModalOpen);
+  const setIsOpen = useUIStore((state) => state.setAddAssetModalOpen);
   const [loading, setLoading] = useState(false);
   const [assetType, setAssetType] = useState<"FD" | "Stock" | "Mutual Fund" | "PPF">("FD");
   const [bankSelection, setBankSelection] = useState("HDFC Bank");
@@ -98,12 +100,14 @@ export function AddAssetModal() {
 
   return (
     <>
-      <button 
-        onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 bg-tint text-background px-4 py-2 rounded-sm font-medium shadow-sm hover:opacity-90 transition-opacity hover:cursor-pointer"
-      >
-        <Plus className="w-4 h-4" /> Add Asset
-      </button>
+      {!hideTrigger && (
+        <button 
+          onClick={() => setIsOpen(true)}
+          className="flex items-center gap-2 bg-tint text-background px-4 py-2 rounded-sm font-medium shadow-sm hover:opacity-90 transition-opacity hover:cursor-pointer"
+        >
+          <Plus className="w-4 h-4" /> Add Asset
+        </button>
+      )}
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
