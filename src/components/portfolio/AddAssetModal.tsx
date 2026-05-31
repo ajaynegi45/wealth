@@ -12,7 +12,7 @@ export function AddAssetModal({ hideTrigger = false }: { hideTrigger?: boolean }
   const isOpen = useUIStore((state) => state.isAddAssetModalOpen);
   const setIsOpen = useUIStore((state) => state.setAddAssetModalOpen);
   const [loading, setLoading] = useState(false);
-  const [assetType, setAssetType] = useState<"FD" | "Stock" | "Mutual Fund" | "PPF">("FD");
+  const [assetType, setAssetType] = useState<"FD" | "Stock" | "Mutual Fund" | "PPF" | "Bank Balance">("FD");
   const [bankSelection, setBankSelection] = useState("HDFC Bank");
   const { invalidate, fetchAssets } = useAssetStore();
 
@@ -73,6 +73,32 @@ export function AddAssetModal({ hideTrigger = false }: { hideTrigger?: boolean }
       };
     } else if (assetType === "PPF") {
       metadata = {};
+    } else if (assetType === "Bank Balance") {
+      const customBankName = formData.get("customBankName") as string;
+      const finalBankName = bankSelection === "Other" ? customBankName : bankSelection;
+      if (bankSelection === "Other" && !customBankName) {
+        toast.error("Please enter a custom bank name.");
+        return;
+      }
+      
+      const accType = formData.get("accountType") as string;
+      let intRate = 0;
+      let payout = "";
+      if (accType === "Savings") {
+        const rateStr = formData.get("interestRate") as string;
+        if (!rateStr) {
+          toast.error("Please enter an interest rate for Savings account.");
+          return;
+        }
+        intRate = Number(rateStr);
+        payout = formData.get("interestPayout") as string;
+      }
+      metadata = {
+        bankName: finalBankName,
+        accountType: accType,
+        interestRate: intRate,
+        interestPayout: payout,
+      };
     }
 
     setLoading(true);
@@ -142,6 +168,7 @@ export function AddAssetModal({ hideTrigger = false }: { hideTrigger?: boolean }
                     <option value="Stock">Stock</option>
                     <option value="Mutual Fund">Mutual Fund</option>
                     <option value="PPF">Public Provident Fund (PPF)</option>
+                    <option value="Bank Balance">Bank Balance</option>
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 </div>
@@ -236,6 +263,82 @@ export function AddAssetModal({ hideTrigger = false }: { hideTrigger?: boolean }
                 </>
               )}
 
+              {assetType === "Bank Balance" && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label htmlFor="bankSelect" className={labelBase}>Bank <span className="text-destructive">*</span></label>
+                      <div className="relative">
+                        <select 
+                          id="bankSelect"
+                          value={bankSelection}
+                          onChange={(e) => setBankSelection(e.target.value)}
+                          className={selectBase}
+                        >
+                          <option value="HDFC Bank">HDFC Bank</option>
+                          <option value="State Bank of India">State Bank of India (SBI)</option>
+                          <option value="ICICI Bank">ICICI Bank</option>
+                          <option value="Axis Bank">Axis Bank</option>
+                          <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
+                          <option value="Other">Other...</option>
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                      </div>
+                    </div>
+                    {bankSelection === "Other" ? (
+                      <div className="space-y-1.5">
+                        <label htmlFor="customBankName" className={labelBase}>Enter Bank <span className="text-destructive">*</span></label>
+                        <input id="customBankName" name="customBankName" placeholder="e.g. Yes Bank" className={inputBase} />
+                      </div>
+                    ) : (
+                      <div className="space-y-1.5">
+                        <label htmlFor="accountType" className={labelBase}>Account Type <span className="text-destructive">*</span></label>
+                        <div className="relative">
+                          <select id="accountType" name="accountType" defaultValue="Savings" className={selectBase}>
+                            <option value="Savings">Savings</option>
+                            <option value="Current">Current</option>
+                          </select>
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {bankSelection === "Other" && (
+                     <div className="space-y-1.5">
+                       <label htmlFor="accountType" className={labelBase}>Account Type <span className="text-destructive">*</span></label>
+                       <div className="relative">
+                         <select id="accountType" name="accountType" defaultValue="Savings" className={selectBase}>
+                           <option value="Savings">Savings</option>
+                           <option value="Current">Current</option>
+                         </select>
+                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                       </div>
+                     </div>
+                  )}
+
+                  {/* NOTE: If the user changes Account Type, this will be handled via form submission logic, but for better UX we could track it. Assuming Savings is default. */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label htmlFor="interestRate" className={labelBase}>Interest Rate (%)</label>
+                      <input id="interestRate" name="interestRate" type="number" step="0.01" placeholder="3.50" className={inputBase} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label htmlFor="interestPayout" className={labelBase}>Interest Payout</label>
+                      <div className="relative">
+                        <select id="interestPayout" name="interestPayout" defaultValue="Quarterly" className={selectBase}>
+                          <option value="Monthly">Monthly</option>
+                          <option value="Quarterly">Quarterly</option>
+                          <option value="Yearly">Yearly</option>
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Leave interest blank if this is a Current account.</p>
+                </>
+              )}
+
               {(assetType === "Stock" || assetType === "Mutual Fund") && (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
@@ -251,11 +354,11 @@ export function AddAssetModal({ hideTrigger = false }: { hideTrigger?: boolean }
 
               <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-1.5">
-                    <label htmlFor="amount" className={labelBase}>{assetType === "FD" ? "Principal (₹)" : (assetType === "PPF" ? "Initial Deposit (₹)" : "Total Invested (₹)")} <span className="text-destructive">*</span></label>
+                    <label htmlFor="amount" className={labelBase}>{assetType === "FD" ? "Principal (₹)" : (assetType === "PPF" ? "Initial Deposit (₹)" : assetType === "Bank Balance" ? "Current Balance (₹)" : "Total Invested (₹)")} <span className="text-destructive">*</span></label>
                     <input id="amount" name="amount" type="number" step={assetType === "PPF" ? "50" : "0.01"} placeholder="100000" className={inputBase} />
                  </div>
                  <div className="space-y-1.5">
-                    <label htmlFor="startDate" className={labelBase}>{assetType === "PPF" ? "Account Opening Date" : "Purchase Date"} <span className="text-destructive">*</span></label>
+                    <label htmlFor="startDate" className={labelBase}>{assetType === "PPF" ? "Account Opening Date" : assetType === "Bank Balance" ? "As of Date" : "Purchase Date"} <span className="text-destructive">*</span></label>
                     <input id="startDate" name="startDate" type="date" className={inputBase} />
                  </div>
               </div>

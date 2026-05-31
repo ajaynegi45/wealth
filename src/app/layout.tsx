@@ -33,9 +33,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body
-        className={`${inter.variable} ${outfit.variable} antialiased bg-background text-foreground min-h-screen flex flex-col font-sans`}
+        className={`${inter.variable} ${outfit.variable} antialiased bg-card text-foreground min-h-screen flex flex-col font-sans`}
       >
-        {children}
+        <div className="flex-1 bg-background flex flex-col min-h-screen">
+          {children}
+        </div>
         <Toaster position="bottom-right" richColors />
       </body>
     </html>

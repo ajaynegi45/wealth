@@ -88,6 +88,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       
       <AddAssetModal hideTrigger={true} />
 
+      {/* Solid background for Android navigation bar blending */}
+      <div className="md:hidden fixed bottom-0 left-0 w-full h-[env(safe-area-inset-bottom)] bg-card z-30" />
+
       {/* Mobile Bottom Navigation */}
       <nav 
         className="md:hidden fixed bottom-0 w-full z-40 bg-card/85 backdrop-blur-2xl border-t border-separator/30 pb-[env(safe-area-inset-bottom)]"

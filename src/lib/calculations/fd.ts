@@ -100,14 +100,25 @@ export function calculateFDMaturityValue(
   durationMonths: number,
   durationDays: number,
   payout: InterestPayout,
-  compounding: CompoundingFrequency
+  compounding: CompoundingFrequency,
+  autoRenew: boolean = false,
+  targetDate: Date = new Date()
 ): number {
   if (payout === "Quarterly" || payout === "Monthly") {
     return principal;
   }
 
-  const maturityDate = getFDMaturityDate(startDate, durationYears, durationMonths, durationDays);
-  let grossInterest = calculateCompoundInterest(principal, interestRate, startDate, maturityDate, compounding);
+  const originalMaturityDate = getFDMaturityDate(startDate, durationYears, durationMonths, durationDays);
+  let currentMaturityDate = originalMaturityDate;
+  
+  if (autoRenew) {
+    let now = new Date(targetDate);
+    while (currentMaturityDate <= now) {
+      currentMaturityDate = getFDMaturityDate(currentMaturityDate, durationYears, durationMonths, durationDays);
+    }
+  }
+
+  let grossInterest = calculateCompoundInterest(principal, interestRate, startDate, currentMaturityDate, compounding);
   
   const netInterest = applyTDS(grossInterest);
   return principal + netInterest;

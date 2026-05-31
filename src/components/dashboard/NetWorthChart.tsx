@@ -6,6 +6,7 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { formatINR } from "@/lib/formatters";
 import { useUIStore } from "@/store/useUIStore";
 import { calculateFDCurrentValue, calculateFDInterestPaidOut } from "@/lib/calculations/fd";
+import { calculateBankCurrentValue } from "@/lib/calculations/bank";
 import { calculateSimulatedMarketValue } from "@/lib/calculations/marketSim";
 import { calculatePPFLedger } from "@/lib/calculations/ppf";
 import { addMonths, addDays, addYears, format, max, min, differenceInMonths, differenceInDays, differenceInYears, isBefore, isAfter } from "date-fns";
@@ -94,6 +95,23 @@ export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { asset
       totalPrincipal += principal;
       totalAbsoluteReturns += (currentBalance - principal);
       return sum + currentBalance;
+    }
+    
+    if (a.type === "Bank Balance" && a.metadata) {
+      if (a.metadata.accountType === "Savings") {
+        const cv = calculateBankCurrentValue(
+          Number(a.amount),
+          Number(a.metadata.interestRate),
+          new Date(a.startDate),
+          a.metadata.interestPayout,
+          today
+        );
+        totalPrincipal += Number(a.amount);
+        totalAbsoluteReturns += (cv - Number(a.amount));
+        return sum + cv;
+      }
+      totalPrincipal += Number(a.amount);
+      return sum + Number(a.amount);
     }
     
     totalPrincipal += Number(a.amount);
@@ -192,6 +210,21 @@ export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { asset
         } else if (a.type === "PPF" && a.metadata?.rawTransactions) {
           pointPrincipal += getPPFPrincipalAtDate(a.metadata.rawTransactions, currDate);
           pointTotal += getPPFBalanceAtDate(ppfLedgers.get(a.id) || [], currDate);
+        } else if (a.type === "Bank Balance" && a.metadata) {
+          if (a.metadata.accountType === "Savings") {
+            const cv = calculateBankCurrentValue(
+              Number(a.amount),
+              Number(a.metadata.interestRate),
+              new Date(a.startDate),
+              a.metadata.interestPayout,
+              currDate
+            );
+            pointPrincipal += Number(a.amount);
+            pointTotal += cv;
+          } else {
+            pointPrincipal += Number(a.amount);
+            pointTotal += Number(a.amount);
+          }
         } else {
           pointPrincipal += Number(a.amount);
           pointTotal += Number(a.amount);

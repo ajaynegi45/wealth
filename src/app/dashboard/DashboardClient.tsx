@@ -19,6 +19,7 @@ export function DashboardClient({ firstName }: { firstName: string }) {
   const stockAssets = assets.filter((a) => a.type === "Stock");
   const mfAssets = assets.filter((a) => a.type === "Mutual Fund");
   const ppfAssets = assets.filter((a) => a.type === "PPF");
+  const bankAssets = assets.filter((a) => a.type === "Bank Balance");
 
   return (
     <div className="w-full h-full pb-10">
@@ -51,12 +52,13 @@ export function DashboardClient({ firstName }: { firstName: string }) {
         <div className="space-y-6">
           <NetWorthChart assets={assets} title="Live Net Worth" />
 
-          {(fdAssets.length > 0 || stockAssets.length > 0 || mfAssets.length > 0 || ppfAssets.length > 0) && (
+          {(fdAssets.length > 0 || stockAssets.length > 0 || mfAssets.length > 0 || ppfAssets.length > 0 || bankAssets.length > 0) && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-6 mt-6">
               {fdAssets.length > 0 && <NetWorthChart assets={fdAssets} title="Fixed Deposits" />}
               {stockAssets.length > 0 && <NetWorthChart assets={stockAssets} title="Stocks" />}
               {mfAssets.length > 0 && <NetWorthChart assets={mfAssets} title="Mutual Funds" />}
               {ppfAssets.length > 0 && <PPFChart asset={ppfAssets[0]} title="Public Provident Fund" />}
+              {bankAssets.length > 0 && <NetWorthChart assets={bankAssets} title="Bank Balances" />}
             </div>
           )}
         </div>

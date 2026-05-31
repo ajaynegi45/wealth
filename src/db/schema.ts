@@ -81,11 +81,27 @@ export const ppfTransactions = pgTable("ppf_transactions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const bankAccounts = pgTable("bank_accounts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  bankName: varchar("bank_name", { length: 255 }).notNull(),
+  accountType: varchar("account_type", { length: 50 }).notNull(), // "Savings" or "Current"
+  balance: numeric("balance", { precision: 15, scale: 2 }).notNull(),
+  interestRate: numeric("interest_rate", { precision: 5, scale: 2 }).default("0").notNull(),
+  interestPayout: varchar("interest_payout", { length: 50 }), // e.g. Monthly, Quarterly, Yearly
+  openedAt: timestamp("opened_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const usersRelations = relations(users, ({ many }) => ({
   fixedDeposits: many(fixedDeposits),
   stocks: many(stocks),
   mutualFunds: many(mutualFunds),
   ppfAccounts: many(ppfAccounts),
+  bankAccounts: many(bankAccounts),
 }));
 
 export const ppfAccountsRelations = relations(ppfAccounts, ({ one, many }) => ({

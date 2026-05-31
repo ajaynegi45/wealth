@@ -1,14 +1,14 @@
 "use server";
 
 import { db } from "@/db";
-import { fixedDeposits, stocks, mutualFunds, ppfAccounts, ppfTransactions } from "@/db/schema";
+import { fixedDeposits, stocks, mutualFunds, ppfAccounts, ppfTransactions, bankAccounts } from "@/db/schema";
 import { auth } from "@/../auth";
 import { revalidatePath } from "next/cache";
 import { eq, and } from "drizzle-orm";
 import { calculatePPFLedger, calculatePPFMaturity, validatePPFDeposit } from "@/lib/calculations/ppf";
 
 export async function addAsset(data: {
-  type: "FD" | "Stock" | "Mutual Fund" | "PPF";
+  type: "FD" | "Stock" | "Mutual Fund" | "PPF" | "Bank Balance";
   amount: number;
   startDate: Date;
   metadata?: any;
@@ -79,6 +79,16 @@ export async function addAsset(data: {
         type: 'Deposit'
       });
     }
+  } else if (data.type === "Bank Balance") {
+    await db.insert(bankAccounts).values({
+      userId: userRecord.id,
+      bankName: data.metadata.bankName,
+      accountType: data.metadata.accountType,
+      balance: data.amount.toString(),
+      interestRate: data.metadata.interestRate?.toString() || "0",
+      interestPayout: data.metadata.interestPayout,
+      openedAt: data.startDate,
+    });
   }
 
   revalidatePath("/dashboard");
@@ -86,7 +96,7 @@ export async function addAsset(data: {
   return { success: true };
 }
 
-export async function deleteAsset(id: number, type: "FD" | "Stock" | "Mutual Fund" | "PPF") {
+export async function deleteAsset(id: number, type: "FD" | "Stock" | "Mutual Fund" | "PPF" | "Bank Balance") {
   const session = await auth();
   if (!session || !session.user || !session.user.email) {
     throw new Error("Unauthorized");
@@ -106,6 +116,8 @@ export async function deleteAsset(id: number, type: "FD" | "Stock" | "Mutual Fun
     await db.delete(mutualFunds).where(and(eq(mutualFunds.id, id), eq(mutualFunds.userId, userRecord.id)));
   } else if (type === "PPF") {
     await db.delete(ppfAccounts).where(and(eq(ppfAccounts.id, id), eq(ppfAccounts.userId, userRecord.id)));
+  } else if (type === "Bank Balance") {
+    await db.delete(bankAccounts).where(and(eq(bankAccounts.id, id), eq(bankAccounts.userId, userRecord.id)));
   }
 
   revalidatePath("/dashboard");
@@ -125,7 +137,7 @@ export async function getUserAssets() {
 
   if (!userRecord) return [];
 
-  const [fds, stks, mfs, ppfs] = await Promise.all([
+  const [fds, stks, mfs, ppfs, bankAccountsData] = await Promise.all([
     db.query.fixedDeposits.findMany({ where: (fd, { eq }) => eq(fd.userId, userRecord.id) }),
     db.query.stocks.findMany({ where: (s, { eq }) => eq(s.userId, userRecord.id) }),
     db.query.mutualFunds.findMany({ where: (mf, { eq }) => eq(mf.userId, userRecord.id) }),
@@ -133,6 +145,7 @@ export async function getUserAssets() {
       where: (p, { eq }) => eq(p.userId, userRecord.id),
       with: { transactions: true }
     }),
+    db.query.bankAccounts.findMany({ where: (b, { eq }) => eq(b.userId, userRecord.id) }),
   ]);
 
   const standardizedAssets = [
@@ -198,7 +211,19 @@ export async function getUserAssets() {
           }))
         }
       };
-    })
+    }),
+    ...bankAccountsData.map(b => ({
+      id: b.id,
+      type: "Bank Balance" as const,
+      amount: b.balance,
+      startDate: b.openedAt,
+      metadata: {
+        bankName: b.bankName,
+        accountType: b.accountType,
+        interestRate: b.interestRate,
+        interestPayout: b.interestPayout,
+      }
+    }))
   ];
 
   return standardizedAssets.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());

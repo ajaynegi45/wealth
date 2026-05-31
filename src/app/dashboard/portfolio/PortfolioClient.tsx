@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { AddAssetModal } from "@/components/portfolio/AddAssetModal";
 import { DeleteAssetButton } from "@/components/portfolio/DeleteAssetButton";
 import { calculateFDCurrentValue, calculateFDMaturityValue, calculateFDInterestPaidOut, getFDMaturityDate, calculateFDTDS } from "@/lib/calculations/fd";
+import { calculateBankCurrentValue } from "@/lib/calculations/bank";
 import { formatINR } from "@/lib/formatters";
 import { format, intervalToDuration } from "date-fns";
 import { Wallet, TrendingUp, Loader2 } from "lucide-react";
@@ -42,6 +43,17 @@ export function PortfolioClient() {
         meta.compoundingFrequency || "Quarterly",
         meta.autoRenew || false
       );
+    } else if (a.type === "Bank Balance" && a.metadata) {
+      const meta = a.metadata as any;
+      if (meta.accountType === "Savings") {
+        return sum + calculateBankCurrentValue(
+          Number(a.amount),
+          Number(meta.interestRate),
+          new Date(a.startDate),
+          meta.interestPayout
+        );
+      }
+      return sum + Number(a.amount);
     }
     return sum + Number(a.amount);
   }, 0);
@@ -190,7 +202,8 @@ export function PortfolioClient() {
                 meta.durationMonths || 0,
                 meta.durationDays || 0,
                 meta.interestPayout,
-                meta.compoundingFrequency || "Quarterly"
+                meta.compoundingFrequency || "Quarterly",
+                meta.autoRenew || false
               );
             } else if (asset.type === "PPF" && meta.rawTransactions) {
               const ppfPrincipal = meta.rawTransactions.reduce((acc: number, t: any) => {
@@ -199,6 +212,19 @@ export function PortfolioClient() {
                 return acc;
               }, 0);
               returns = currentValue - ppfPrincipal;
+            } else if (asset.type === "Bank Balance") {
+              if (meta.accountType === "Savings") {
+                currentValue = calculateBankCurrentValue(
+                  Number(asset.amount),
+                  Number(meta.interestRate),
+                  new Date(asset.startDate),
+                  meta.interestPayout
+                );
+                returns = currentValue - Number(asset.amount);
+              } else {
+                returns = 0;
+                currentValue = Number(asset.amount);
+              }
             }
             
             const displayPrincipal = asset.type === "PPF" ? Number(asset.amount) - returns : Number(asset.amount);
@@ -217,6 +243,9 @@ export function PortfolioClient() {
                     {asset.type === "FD" && (
                       <h3 className="font-bold text-foreground text-lg leading-tight mb-1">{meta.bankName}</h3>
                     )}
+                    {asset.type === "Bank Balance" && (
+                      <h3 className="font-bold text-foreground text-lg leading-tight mb-1">{meta.bankName}</h3>
+                    )}
                     {(asset.type === "Stock" || asset.type === "Mutual Fund") && meta.ticker && (
                       <h3 className="font-bold text-foreground text-lg leading-tight mb-1">{meta.ticker}</h3>
                     )}
@@ -227,6 +256,11 @@ export function PortfolioClient() {
                     {asset.type === "FD" && (
                       <p className="text-xs text-muted-foreground mt-1">
                         {meta.interestPayout} • {meta.compoundingFrequency} • {meta.interestRate}% p.a.
+                      </p>
+                    )}
+                    {asset.type === "Bank Balance" && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {meta.accountType} {meta.accountType === "Savings" ? `• ${meta.interestRate}% p.a. • ${meta.interestPayout}` : ""}
                       </p>
                     )}
                     {(asset.type === "Stock" || asset.type === "Mutual Fund") && meta.ticker && (
