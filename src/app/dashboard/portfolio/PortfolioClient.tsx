@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AddAssetModal } from "@/components/portfolio/AddAssetModal";
 import { DeleteAssetButton } from "@/components/portfolio/DeleteAssetButton";
 import { calculateFDCurrentValue, calculateFDMaturityValue, calculateFDInterestPaidOut, getFDMaturityDate, calculateFDTDS } from "@/lib/calculations/fd";
@@ -11,8 +11,11 @@ import { Wallet, TrendingUp, Loader2 } from "lucide-react";
 import { useAssetStore } from "@/store/useAssetStore";
 import Link from "next/link";
 
+const FILTERS = ["All", "FD", "PPF", "NPS", "Bank Account", "Stocks", "Mutual Funds"];
+
 export function PortfolioClient() {
   const { assets, isLoading, fetchAssets } = useAssetStore();
+  const [filterType, setFilterType] = useState("All");
 
   useEffect(() => {
     fetchAssets();
@@ -60,6 +63,13 @@ export function PortfolioClient() {
   
   const totalReturns = totalCurrentValue - totalPrincipal;
 
+  const filteredAssets = filterType === "All" ? assets : assets.filter(a => {
+    if (filterType === "Bank Account") return a.type === "Bank Balance";
+    if (filterType === "Stocks") return a.type === "Stock";
+    if (filterType === "Mutual Funds") return a.type === "Mutual Fund";
+    return a.type === filterType;
+  });
+
   if (isLoading && assets.length === 0) {
     return (
       <div className="w-full h-[600px] flex items-center justify-center">
@@ -100,15 +110,33 @@ export function PortfolioClient() {
 
       <h2 className="text-xl font-bold mb-4">Portfolio Holdings</h2>
       
-      {assets.length === 0 ? (
+      <div className="flex overflow-x-auto pb-2 mb-6 gap-2 no-scrollbar">
+        {FILTERS.map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilterType(f)}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+              filterType === f
+                ? "bg-tint text-primary-foreground shadow-sm"
+                : "bg-card/50 text-muted-foreground border border-separator/80 hover:bg-card hover:text-foreground"
+            }`}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+      
+      {filteredAssets.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 bg-card/30 border border-dashed border-separator/50 rounded-3xl">
           <Wallet className="w-12 h-12 text-muted-foreground/30 mb-4" />
           <p className="text-muted-foreground font-medium">No assets found.</p>
-          <p className="text-sm text-muted-foreground/70 mt-1">Add your first asset to start tracking.</p>
+          <p className="text-sm text-muted-foreground/70 mt-1">
+            {filterType !== "All" ? `You don't have any ${filterType} assets yet.` : "Add your first asset to start tracking."}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {assets.map((asset) => {
+          {filteredAssets.map((asset) => {
             const meta = (asset.metadata || {}) as any;
             
             let currentValue = Number(asset.amount);
