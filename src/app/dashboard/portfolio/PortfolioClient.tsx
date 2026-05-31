@@ -8,6 +8,7 @@ import { formatINR } from "@/lib/formatters";
 import { format, intervalToDuration } from "date-fns";
 import { Wallet, TrendingUp, Loader2 } from "lucide-react";
 import { useAssetStore } from "@/store/useAssetStore";
+import Link from "next/link";
 
 export function PortfolioClient() {
   const { assets, isLoading, fetchAssets } = useAssetStore();
@@ -200,6 +201,9 @@ export function PortfolioClient() {
                     {(asset.type === "Stock" || asset.type === "Mutual Fund") && meta.ticker && (
                       <h3 className="font-bold text-foreground text-lg leading-tight mb-1">{meta.ticker}</h3>
                     )}
+                    {asset.type === "PPF" && (
+                      <h3 className="font-bold text-foreground text-lg leading-tight mb-1">Public Provident Fund</h3>
+                    )}
                     
                     {asset.type === "FD" && (
                       <p className="text-xs text-muted-foreground mt-1">
@@ -209,6 +213,11 @@ export function PortfolioClient() {
                     {(asset.type === "Stock" || asset.type === "Mutual Fund") && meta.ticker && (
                       <p className="text-xs text-muted-foreground mt-1">
                         {meta.quantity} Units
+                      </p>
+                    )}
+                    {asset.type === "PPF" && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {meta.transactionsCount || 0} Transactions
                       </p>
                     )}
                   </div>
@@ -225,19 +234,21 @@ export function PortfolioClient() {
                 
                 <div className="space-y-2 mb-6 flex-1">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground font-medium">Principal</span>
-                    <span className="font-semibold text-foreground">{formatINR(Number(asset.amount))}</span>
+                    <span className="text-muted-foreground font-medium">{asset.type === "PPF" ? "Total Invested" : "Principal"}</span>
+                    <span className="font-semibold text-foreground">{formatINR(Number(asset.amount) - (asset.type === "PPF" ? returns : 0))}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground font-medium">Current Value</span>
                     <span className="font-semibold text-foreground">{formatINR(currentValue)}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground font-medium">Returns</span>
-                    <span className={`font-semibold ${returns >= 0 ? "text-success" : "text-destructive"}`}>
-                      {returns >= 0 ? "+" : ""}{formatINR(returns)}
-                    </span>
-                  </div>
+                  {asset.type !== "PPF" && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground font-medium">Returns</span>
+                      <span className={`font-semibold ${returns >= 0 ? "text-success" : "text-destructive"}`}>
+                        {returns >= 0 ? "+" : ""}{formatINR(returns)}
+                      </span>
+                    </div>
+                  )}
                   {paidOutInterest > 0 && (
                     <div className="flex justify-between text-sm pt-2 border-t border-separator/20 mt-2">
                       <span className="text-muted-foreground font-medium">Interest Paid Out</span>
@@ -266,6 +277,9 @@ export function PortfolioClient() {
                     {asset.type === "FD" && meta.displayMaturityDate && (
                       <span>Matures: {format(meta.displayMaturityDate, "MMM dd, yyyy")}</span>
                     )}
+                    {asset.type === "PPF" && meta.maturityDate && (
+                      <span>Matures: {format(new Date(meta.maturityDate), "MMM dd, yyyy")}</span>
+                    )}
                   </div>
                   {asset.type === "FD" && (
                     <div className="flex flex-col items-end gap-1 text-right">
@@ -273,6 +287,13 @@ export function PortfolioClient() {
                       {isAutoRenewing && (
                         <span className="text-[10px] opacity-70 tracking-widest uppercase">Total Active</span>
                       )}
+                    </div>
+                  )}
+                  {asset.type === "PPF" && (
+                    <div className="flex flex-col items-end gap-1 text-right">
+                      <Link href="/dashboard/portfolio/ppf" className="text-tint hover:underline text-sm font-bold flex items-center">
+                        View Ledger &rarr;
+                      </Link>
                     </div>
                   )}
                 </div>

@@ -10,7 +10,7 @@ import { useAssetStore } from "@/store/useAssetStore";
 export function AddAssetModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [assetType, setAssetType] = useState<"FD" | "Stock" | "Mutual Fund">("FD");
+  const [assetType, setAssetType] = useState<"FD" | "Stock" | "Mutual Fund" | "PPF">("FD");
   const [bankSelection, setBankSelection] = useState("HDFC Bank");
   const { invalidate, fetchAssets } = useAssetStore();
 
@@ -69,6 +69,8 @@ export function AddAssetModal() {
         ticker: ticker,
         quantity: Number(qtyStr),
       };
+    } else if (assetType === "PPF") {
+      metadata = {};
     }
 
     setLoading(true);
@@ -135,6 +137,7 @@ export function AddAssetModal() {
                     <option value="FD">Fixed Deposit</option>
                     <option value="Stock">Stock</option>
                     <option value="Mutual Fund">Mutual Fund</option>
+                    <option value="PPF">Public Provident Fund (PPF)</option>
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 </div>
@@ -244,11 +247,11 @@ export function AddAssetModal() {
 
               <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-1.5">
-                    <label htmlFor="amount" className={labelBase}>{assetType === "FD" ? "Principal (₹)" : "Total Invested (₹)"} <span className="text-destructive">*</span></label>
-                    <input id="amount" name="amount" type="number" step="0.01" placeholder="100000" className={inputBase} />
+                    <label htmlFor="amount" className={labelBase}>{assetType === "FD" ? "Principal (₹)" : (assetType === "PPF" ? "Initial Deposit (₹)" : "Total Invested (₹)")} <span className="text-destructive">*</span></label>
+                    <input id="amount" name="amount" type="number" step={assetType === "PPF" ? "50" : "0.01"} placeholder="100000" className={inputBase} />
                  </div>
                  <div className="space-y-1.5">
-                    <label htmlFor="startDate" className={labelBase}>Purchase Date <span className="text-destructive">*</span></label>
+                    <label htmlFor="startDate" className={labelBase}>{assetType === "PPF" ? "Account Opening Date" : "Purchase Date"} <span className="text-destructive">*</span></label>
                     <input id="startDate" name="startDate" type="date" className={inputBase} />
                  </div>
               </div>

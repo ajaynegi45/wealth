@@ -59,8 +59,46 @@ export const mutualFunds = pgTable("mutual_funds", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const ppfAccounts = pgTable("ppf_accounts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  openingDate: timestamp("opening_date").notNull(),
+  extensionBlocks: integer("extension_blocks").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const ppfTransactions = pgTable("ppf_transactions", {
+  id: serial("id").primaryKey(),
+  accountId: integer("account_id")
+    .references(() => ppfAccounts.id, { onDelete: "cascade" })
+    .notNull(),
+  amount: numeric("amount", { precision: 15, scale: 2 }).notNull(),
+  transactionDate: timestamp("transaction_date").notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // "Deposit" or "Withdrawal"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const usersRelations = relations(users, ({ many }) => ({
   fixedDeposits: many(fixedDeposits),
   stocks: many(stocks),
   mutualFunds: many(mutualFunds),
+  ppfAccounts: many(ppfAccounts),
+}));
+
+export const ppfAccountsRelations = relations(ppfAccounts, ({ one, many }) => ({
+  user: one(users, {
+    fields: [ppfAccounts.userId],
+    references: [users.id],
+  }),
+  transactions: many(ppfTransactions),
+}));
+
+export const ppfTransactionsRelations = relations(ppfTransactions, ({ one }) => ({
+  account: one(ppfAccounts, {
+    fields: [ppfTransactions.accountId],
+    references: [ppfAccounts.id],
+  }),
 }));
