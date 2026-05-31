@@ -64,7 +64,6 @@ export function PPFChart({ asset, title = "PPF Growth & Simulation" }: { asset: 
 
   // Helper to find balance at a specific date from a ledger
   const getBalanceAtDate = (ledger: any[], targetDate: Date) => {
-    // Find the last entry that occurred on or before the target date
     let bal = 0;
     for (let i = 0; i < ledger.length; i++) {
       if (new Date(ledger[i].date) <= targetDate) {
@@ -76,6 +75,17 @@ export function PPFChart({ asset, title = "PPF Growth & Simulation" }: { asset: 
     return bal;
   };
 
+  const getPrincipalAtDate = (transactions: any[], targetDate: Date) => {
+    let principal = 0;
+    for (const t of transactions) {
+      if (new Date(t.transactionDate) <= targetDate) {
+        if (t.type === 'Deposit') principal += Number(t.amount);
+        if (t.type === 'Withdrawal') principal -= Number(t.amount);
+      }
+    }
+    return Math.max(0, principal);
+  };
+
   while (currDate <= today) {
     let label = "";
     if (granularity === "days") label = format(currDate, "MMM dd");
@@ -84,12 +94,18 @@ export function PPFChart({ asset, title = "PPF Growth & Simulation" }: { asset: 
 
     const actualVal = getBalanceAtDate(actualLedger, currDate);
     const idealVal = getBalanceAtDate(idealLedger, currDate);
+    const principalVal = getPrincipalAtDate(rawTransactions, currDate);
+    const gainsVal = Math.max(0, actualVal - principalVal);
+    const lostInterestVal = Math.max(0, idealVal - actualVal);
 
     chartData.push({
       timeLabel: label,
-      actual: actualVal,
-      ideal: idealVal,
-      idealVisual: hasLostInterest && idealVal > 0 ? idealVal + Math.max(500, actualVal * 0.015) : idealVal
+      principal: principalVal,
+      gains: gainsVal,
+      lostInterest: hasLostInterest && lostInterestVal > 0 ? lostInterestVal + Math.max(500, actualVal * 0.015) : 0,
+      lostInterestTrue: lostInterestVal,
+      actualBalance: actualVal,
+      idealBalance: idealVal,
     });
 
     if (granularity === "days") currDate = addDays(currDate, stepDays);
@@ -97,21 +113,32 @@ export function PPFChart({ asset, title = "PPF Growth & Simulation" }: { asset: 
     else if (granularity === "years") currDate = addYears(currDate, stepYears);
   }
 
+  const currentPrincipal = getPrincipalAtDate(rawTransactions, today);
+  const currentGains = Math.max(0, actualBalance - currentPrincipal);
+  const currentLostInterest = Math.max(0, idealBalance - actualBalance);
+
   // Always add 'today' as the final point to ensure exact current balance is visible
   chartData.push({
     timeLabel: "Today",
-    actual: actualBalance,
-    ideal: idealBalance,
-    idealVisual: hasLostInterest && idealBalance > 0 ? idealBalance + Math.max(500, actualBalance * 0.015) : idealBalance
+    principal: currentPrincipal,
+    gains: currentGains,
+    lostInterest: hasLostInterest && currentLostInterest > 0 ? currentLostInterest + Math.max(500, actualBalance * 0.015) : 0,
+    lostInterestTrue: currentLostInterest,
+    actualBalance: actualBalance,
+    idealBalance: idealBalance,
   });
 
   const chartConfig = {
-    actual: {
-      label: "Actual Balance",
+    principal: {
+      label: "Invested Amount",
+      color: "#71717A", // Zinc-500
+    },
+    gains: {
+      label: "Interest Gained",
       color: "#10B981", // Emerald
     },
-    ideal: {
-      label: "Ideal Balance (Paid before 5th)",
+    lostInterest: {
+      label: "Lost Interest",
       color: "#F97316", // Orange
     }
   } satisfies ChartConfig;
@@ -155,13 +182,17 @@ export function PPFChart({ asset, title = "PPF Growth & Simulation" }: { asset: 
             margin={{ left: 0, right: 0, top: 10, bottom: 0 }}
           >
             <defs>
-              <linearGradient id="fillActual" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={chartConfig.actual.color} stopOpacity={0.4} />
-                <stop offset="95%" stopColor={chartConfig.actual.color} stopOpacity={0.0} />
+              <linearGradient id="fillPrincipal" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={chartConfig.principal.color} stopOpacity={0.6} />
+                <stop offset="95%" stopColor={chartConfig.principal.color} stopOpacity={0.1} />
               </linearGradient>
-              <linearGradient id="fillIdeal" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={chartConfig.ideal.color} stopOpacity={0.4} />
-                <stop offset="95%" stopColor={chartConfig.ideal.color} stopOpacity={0.0} />
+              <linearGradient id="fillGains" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={chartConfig.gains.color} stopOpacity={0.6} />
+                <stop offset="95%" stopColor={chartConfig.gains.color} stopOpacity={0.1} />
+              </linearGradient>
+              <linearGradient id="fillLost" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={chartConfig.lostInterest.color} stopOpacity={0.8} />
+                <stop offset="95%" stopColor={chartConfig.lostInterest.color} stopOpacity={0.2} />
               </linearGradient>
             </defs>
             <XAxis
@@ -179,59 +210,62 @@ export function PPFChart({ asset, title = "PPF Growth & Simulation" }: { asset: 
               content={
                 <ChartTooltipContent 
                   indicator="dot" 
-                  formatter={(value, name, item) => (
-                    <>
-                      <div
-                        className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      <div className="flex flex-1 justify-between gap-4 leading-none items-center">
-                        <span className="text-muted-foreground">
-                          {name === 'actual' ? 'Actual Balance' : 'Ideal Balance'}
-                        </span>
-                        <span className="font-mono font-medium text-foreground tabular-nums">
-                          {formatINR(name === 'idealVisual' ? item.payload.ideal : Number(value))}
-                        </span>
-                      </div>
-                    </>
-                  )}
+                  formatter={(value, name, item) => {
+                    const actualValue = name === 'lostInterest' ? item.payload.lostInterestTrue : value;
+                    if (actualValue === 0 && name === 'lostInterest') return null as any; // hide if zero
+                    return (
+                      <>
+                        <div
+                          className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <div className="flex flex-1 justify-between gap-4 leading-none items-center">
+                          <span className="text-muted-foreground">
+                            {name === 'principal' ? 'Invested Amount' : name === 'gains' ? 'Interest Gained' : 'Lost Interest'}
+                          </span>
+                          <span className="font-mono font-medium text-foreground tabular-nums">
+                            {formatINR(Number(actualValue))}
+                          </span>
+                        </div>
+                      </>
+                    );
+                  }}
                 />
               } 
             />
             
+            <Area
+              dataKey="principal"
+              name="principal"
+              type="monotone"
+              stackId="1"
+              fill="url(#fillPrincipal)"
+              fillOpacity={1}
+              stroke={chartConfig.principal.color}
+              strokeWidth={2}
+            />
+            <Area
+              dataKey="gains"
+              name="gains"
+              type="monotone"
+              stackId="1"
+              fill="url(#fillGains)"
+              fillOpacity={1}
+              stroke={chartConfig.gains.color}
+              strokeWidth={2}
+            />
             {showSimulation && (
               <Area
-                dataKey="idealVisual"
-                name="idealVisual"
+                dataKey="lostInterest"
+                name="lostInterest"
                 type="monotone"
-                fill="url(#fillIdeal)"
-                fillOpacity={0.6}
-                stroke={chartConfig.ideal.color}
+                stackId="1"
+                fill="url(#fillLost)"
+                fillOpacity={1}
+                stroke={chartConfig.lostInterest.color}
                 strokeWidth={2}
-                strokeDasharray="5 5"
-                activeDot={{
-                  r: 4,
-                  fill: "var(--background)",
-                  stroke: chartConfig.ideal.color,
-                  strokeWidth: 2,
-                }}
               />
             )}
-
-            <Area
-              dataKey="actual"
-              type="monotone"
-              fill="url(#fillActual)"
-              fillOpacity={1}
-              stroke={chartConfig.actual.color}
-              strokeWidth={4}
-              activeDot={{
-                r: 6,
-                fill: "var(--background)",
-                stroke: chartConfig.actual.color,
-                strokeWidth: 3,
-              }}
-            />
           </AreaChart>
         </ChartContainer>
       </div>

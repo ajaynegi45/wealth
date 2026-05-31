@@ -6,14 +6,45 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { formatINR } from "@/lib/formatters";
 import { calculateFDCurrentValue, calculateFDInterestPaidOut } from "@/lib/calculations/fd";
 import { calculateSimulatedMarketValue } from "@/lib/calculations/marketSim";
+import { calculatePPFLedger } from "@/lib/calculations/ppf";
 import { addMonths, addDays, addYears, format, max, min, differenceInMonths, differenceInDays, differenceInYears, isBefore, isAfter } from "date-fns";
 
 export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { assets?: any[], title?: string }) {
   const today = new Date();
   
+  const ppfLedgers = new Map<number, any[]>();
+  for (const a of assets) {
+    if (a.type === 'PPF' && a.metadata?.rawTransactions) {
+      const { ledger } = calculatePPFLedger(new Date(a.startDate), a.metadata.rawTransactions);
+      ppfLedgers.set(a.id, ledger);
+    }
+  }
+
+  const getPPFBalanceAtDate = (ledger: any[], targetDate: Date) => {
+    let bal = 0;
+    for (let i = 0; i < ledger.length; i++) {
+      if (new Date(ledger[i].date) <= targetDate) {
+        bal = ledger[i].balance;
+      } else {
+        break;
+      }
+    }
+    return bal;
+  };
+
+  const getPPFPrincipalAtDate = (rawTransactions: any[], targetDate: Date) => {
+    let principal = 0;
+    for (const t of rawTransactions) {
+      if (new Date(t.transactionDate) <= targetDate) {
+        if (t.type === 'Deposit') principal += Number(t.amount);
+        if (t.type === 'Withdrawal') principal -= Number(t.amount);
+      }
+    }
+    return Math.max(0, principal);
+  };
+
   // Calculate Live Current Total and True Returns
-  const totalPrincipal = assets.reduce((sum, a) => sum + Number(a.amount), 0);
-  
+  let totalPrincipal = 0;
   let totalAbsoluteReturns = 0;
 
   const currentTotal = assets.reduce((sum, a) => {
@@ -50,10 +81,20 @@ export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { asset
     
     if (a.type === "Stock" || a.type === "Mutual Fund") {
       const cv = calculateSimulatedMarketValue(Number(a.amount), a.id, new Date(a.startDate), today, a.type as any);
+      totalPrincipal += Number(a.amount);
       totalAbsoluteReturns += (cv - Number(a.amount));
       return sum + cv;
     }
     
+    if (a.type === "PPF" && a.metadata?.rawTransactions) {
+      const currentBalance = Number(a.amount);
+      const principal = getPPFPrincipalAtDate(a.metadata.rawTransactions, today);
+      totalPrincipal += principal;
+      totalAbsoluteReturns += (currentBalance - principal);
+      return sum + currentBalance;
+    }
+    
+    totalPrincipal += Number(a.amount);
     return sum + Number(a.amount);
   }, 0);
 
@@ -66,7 +107,7 @@ export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { asset
   if (assets.length === 0) {
     chartData = Array.from({ length: 6 }).map((_, i) => {
       const d = addMonths(today, i - 5);
-      return { timeLabel: format(d, "MMM yyyy"), netWorth: 0 };
+      return { timeLabel: format(d, "MMM yyyy"), principal: 0, gains: 0, actualBalance: 0 };
     });
   } else {
     const startDates = assets.map((a) => new Date(a.startDate));
@@ -117,11 +158,15 @@ export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { asset
     if (granularity === "years") currDate = addYears(currDate, -stepYears);
 
     while (currDate <= latest) {
-      const pointTotal = assets.reduce((sum, a) => {
-        if (currDate < new Date(a.startDate)) return sum; 
+      let pointPrincipal = 0;
+      let pointTotal = 0;
+
+      for (const a of assets) {
+        if (currDate < new Date(a.startDate)) continue; 
         
         if (a.type === "FD" && a.metadata) {
-          return sum + calculateFDCurrentValue(
+          pointPrincipal += Number(a.amount);
+          pointTotal += calculateFDCurrentValue(
             Number(a.amount), 
             Number(a.metadata.interestRate), 
             new Date(a.startDate), 
@@ -133,20 +178,23 @@ export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { asset
             a.metadata.autoRenew || false,
             currDate
           );
-        }
-
-        if (a.type === "Stock" || a.type === "Mutual Fund") {
-          return sum + calculateSimulatedMarketValue(
+        } else if (a.type === "Stock" || a.type === "Mutual Fund") {
+          pointPrincipal += Number(a.amount);
+          pointTotal += calculateSimulatedMarketValue(
             Number(a.amount), 
             a.id, 
             new Date(a.startDate), 
             currDate, 
             a.type as any
           );
+        } else if (a.type === "PPF" && a.metadata?.rawTransactions) {
+          pointPrincipal += getPPFPrincipalAtDate(a.metadata.rawTransactions, currDate);
+          pointTotal += getPPFBalanceAtDate(ppfLedgers.get(a.id) || [], currDate);
+        } else {
+          pointPrincipal += Number(a.amount);
+          pointTotal += Number(a.amount);
         }
-
-        return sum + Number(a.amount);
-      }, 0);
+      }
 
       let label = "";
       if (granularity === "days") label = format(currDate, "MMM dd");
@@ -155,7 +203,9 @@ export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { asset
 
       chartData.push({
         timeLabel: label,
-        netWorth: Math.round(pointTotal)
+        principal: Math.round(pointPrincipal),
+        gains: Math.round(Math.max(0, pointTotal - pointPrincipal)),
+        actualBalance: Math.round(pointTotal)
       });
 
       if (granularity === "days") currDate = addDays(currDate, stepDays);
@@ -168,8 +218,12 @@ export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { asset
   const chartColor = isProfit ? "#10B981" : "#EF4444"; 
 
   const chartConfig = {
-    netWorth: {
-      label: "Value",
+    principal: {
+      label: "Invested Amount",
+      color: "#71717A", // Zinc-500
+    },
+    gains: {
+      label: "Returns Gained",
       color: chartColor,
     },
   } satisfies ChartConfig;
@@ -200,9 +254,13 @@ export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { asset
             margin={{ left: 0, right: 0, top: 10, bottom: 0 }}
           >
             <defs>
-              <linearGradient id="fillNetWorth" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={chartColor} stopOpacity={0.4} />
-                <stop offset="95%" stopColor={chartColor} stopOpacity={0.0} />
+              <linearGradient id="fillPrincipal" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={chartConfig.principal.color} stopOpacity={0.4} />
+                <stop offset="95%" stopColor={chartConfig.principal.color} stopOpacity={0.0} />
+              </linearGradient>
+              <linearGradient id="fillGains" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={chartConfig.gains.color} stopOpacity={0.4} />
+                <stop offset="95%" stopColor={chartConfig.gains.color} stopOpacity={0.0} />
               </linearGradient>
             </defs>
             <XAxis
@@ -224,10 +282,12 @@ export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { asset
                     <>
                       <div
                         className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
-                        style={{ backgroundColor: item.color || chartColor }}
+                        style={{ backgroundColor: item.color }}
                       />
-                      <div className="flex flex-1 justify-between gap-2 leading-none items-center">
-                        <span className="text-muted-foreground">Value</span>
+                      <div className="flex flex-1 justify-between gap-4 leading-none items-center">
+                        <span className="text-muted-foreground">
+                          {name === 'principal' ? 'Invested Amount' : 'Returns Gained'}
+                        </span>
                         <span className="font-mono font-medium text-foreground tabular-nums">
                           {formatINR(Number(value))}
                         </span>
@@ -238,18 +298,24 @@ export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { asset
               } 
             />
             <Area
-              dataKey="netWorth"
+              dataKey="principal"
+              name="principal"
               type="monotone"
-              fill="url(#fillNetWorth)"
+              stackId="1"
+              fill="url(#fillPrincipal)"
               fillOpacity={1}
-              stroke={chartColor}
-              strokeWidth={4}
-              activeDot={{
-                r: 6,
-                fill: "var(--background)",
-                stroke: chartColor,
-                strokeWidth: 3,
-              }}
+              stroke={chartConfig.principal.color}
+              strokeWidth={2}
+            />
+            <Area
+              dataKey="gains"
+              name="gains"
+              type="monotone"
+              stackId="1"
+              fill="url(#fillGains)"
+              fillOpacity={1}
+              stroke={chartConfig.gains.color}
+              strokeWidth={2}
             />
           </AreaChart>
         </ChartContainer>
