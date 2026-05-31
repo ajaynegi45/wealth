@@ -17,7 +17,17 @@ export function PortfolioClient() {
     fetchAssets();
   }, [fetchAssets]);
 
-  const totalPrincipal = assets.reduce((sum, a) => sum + Number(a.amount), 0);
+  const totalPrincipal = assets.reduce((sum, a) => {
+    if (a.type === "PPF" && a.metadata && (a.metadata as any).rawTransactions) {
+      const principal = (a.metadata as any).rawTransactions.reduce((acc: number, t: any) => {
+        if (t.type === "Deposit") return acc + Number(t.amount);
+        if (t.type === "Withdrawal") return acc - Number(t.amount);
+        return acc;
+      }, 0);
+      return sum + principal;
+    }
+    return sum + Number(a.amount);
+  }, 0);
   const totalCurrentValue = assets.reduce((sum, a) => {
     if (a.type === "FD" && a.metadata) {
       const meta = a.metadata as any;
@@ -182,7 +192,16 @@ export function PortfolioClient() {
                 meta.interestPayout,
                 meta.compoundingFrequency || "Quarterly"
               );
+            } else if (asset.type === "PPF" && meta.rawTransactions) {
+              const ppfPrincipal = meta.rawTransactions.reduce((acc: number, t: any) => {
+                if (t.type === "Deposit") return acc + Number(t.amount);
+                if (t.type === "Withdrawal") return acc - Number(t.amount);
+                return acc;
+              }, 0);
+              returns = currentValue - ppfPrincipal;
             }
+            
+            const displayPrincipal = asset.type === "PPF" ? Number(asset.amount) - returns : Number(asset.amount);
 
             const cardClasses = isMatured && !isAutoRenewing
               ? "bg-warning/10 border-warning/50 shadow-[0_0_15px_rgba(245,158,11,0.1)]"
@@ -234,21 +253,19 @@ export function PortfolioClient() {
                 
                 <div className="space-y-2 mb-6 flex-1">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground font-medium">{asset.type === "PPF" ? "Total Invested" : "Principal"}</span>
-                    <span className="font-semibold text-foreground">{formatINR(Number(asset.amount) - (asset.type === "PPF" ? returns : 0))}</span>
+                    <span className="text-muted-foreground font-medium">Principal</span>
+                    <span className="font-semibold text-foreground">{formatINR(displayPrincipal)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground font-medium">Returns</span>
+                    <span className={`font-semibold ${returns >= 0 ? "text-success" : "text-destructive"}`}>
+                      {returns >= 0 ? "+" : ""}{formatINR(returns)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground font-medium">Current Value</span>
                     <span className="font-semibold text-foreground">{formatINR(currentValue)}</span>
                   </div>
-                  {asset.type !== "PPF" && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground font-medium">Returns</span>
-                      <span className={`font-semibold ${returns >= 0 ? "text-success" : "text-destructive"}`}>
-                        {returns >= 0 ? "+" : ""}{formatINR(returns)}
-                      </span>
-                    </div>
-                  )}
                   {paidOutInterest > 0 && (
                     <div className="flex justify-between text-sm pt-2 border-t border-separator/20 mt-2">
                       <span className="text-muted-foreground font-medium">Interest Paid Out</span>

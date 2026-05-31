@@ -3,16 +3,15 @@
 import { useState, Fragment } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Wallet, ArrowLeftRight, User, LogOut, ChevronLeft, ChevronRight, Calculator, Plus } from "lucide-react";
+import { House, Wallet, ArrowLeftRight, User, LogOut, ChevronLeft, ChevronRight, Calculator, Plus } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { AddAssetModal } from "@/components/portfolio/AddAssetModal";
 import { useUIStore } from "@/store/useUIStore";
 
 const NAV_ITEMS = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Dashboard", href: "/dashboard", icon: House },
   { name: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
   { name: "Tax Calculator", href: "/dashboard/tax", icon: Calculator },
-  { name: "Transactions", href: "/dashboard/transactions", icon: ArrowLeftRight },
   { name: "Profile", href: "/dashboard/profile", icon: User },
 ];
 
@@ -81,7 +80,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full pb-24 md:pb-0 px-6 md:px-10 lg:px-12 bg-background">
+      <main className="flex-1 w-full pb-24 md:pb-0 px-4 md:px-10 lg:px-12 bg-background">
         <div className="max-w-7xl mx-auto py-8">
           {children}
         </div>
@@ -97,7 +96,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           WebkitMaskImage: 'radial-gradient(circle at 50% 0px, transparent 36px, black 37px)'
         }}
       >
-        <div className="flex items-center justify-between h-16 px-2">
+        <div className="flex items-center justify-between h-12 px-2">
           {MOBILE_NAV_ITEMS.map((item, index) => {
             const isActive = pathname === item.href;
             const isMiddle = index === 2; // Insert space before 3rd item (index 2)
@@ -120,10 +119,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
       </nav>
 
-      {/* FAB - Placed outside the nav so it doesn't get masked */}
       <div 
         className="md:hidden fixed left-1/2 -translate-x-1/2 z-[50]"
-        style={{ bottom: 'calc(36px + env(safe-area-inset-bottom))' }}
+        style={{ bottom: 'calc(21px + env(safe-area-inset-bottom))' }}
       >
         <button
           onClick={() => setAddAssetModalOpen(true)}

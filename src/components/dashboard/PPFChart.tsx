@@ -152,12 +152,12 @@ export function PPFChart({ asset, title = "PPF Growth & Simulation" }: { asset: 
           <h3 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase flex items-center gap-2">
             {title}
             {hasLostInterest && (
-              <span className="group relative cursor-help flex items-center">
+              <button type="button" className="group relative cursor-help flex items-center outline-none">
                 <Info className="w-4 h-4 text-orange-500" />
-                <div className="absolute left-0 top-full mt-2 hidden group-hover:block w-64 p-2.5 bg-zinc-800 text-zinc-100 text-xs rounded-md shadow-xl z-50 text-left normal-case tracking-normal font-normal">
+                <div className="absolute top-full mt-2 hidden group-hover:block group-focus:block w-56 sm:w-64 p-2.5 bg-zinc-800 text-zinc-100 text-xs rounded-md shadow-xl z-50 text-left normal-case tracking-normal font-normal right-[-70] sm:right-auto sm:left-0">
                   Depositing after the 5th of a month loses out on that month's interest. The ideal line shows what your balance would be if all deposits were on time.
                 </div>
-              </span>
+              </button>
             )}
           </h3>
           <div className="text-xl sm:text-2xl md:text-4xl font-bold text-foreground tracking-tight">

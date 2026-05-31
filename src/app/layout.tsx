@@ -21,6 +21,10 @@ export const metadata: Metadata = {
   description: "Track your financial legacy",
 };
 
+export const viewport = {
+  themeColor: "#ffffff",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
