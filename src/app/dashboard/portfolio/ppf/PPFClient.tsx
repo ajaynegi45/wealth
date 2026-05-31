@@ -15,6 +15,8 @@ export function PPFClient({ account }: { account: any }) {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
+  const currentFY = getFinancialYear(new Date());
+  const [selectedFY, setSelectedFY] = useState<number>(currentFY);
 
   function startEdit(entry: any, rawId: number) {
     setEditingId(rawId);
@@ -57,7 +59,9 @@ export function PPFClient({ account }: { account: any }) {
   const maturityDate = calculatePPFMaturity(new Date(account.openingDate), account.extensionBlocks);
   const isMatured = new Date() >= maturityDate;
 
-  const currentFY = getFinancialYear(new Date());
+  const availableFYs = Array.from(new Set(ledger.map(entry => getFinancialYear(new Date(entry.date))))).sort((a, b) => b - a);
+  const displayedLedger = ledger.filter(entry => getFinancialYear(new Date(entry.date)) === selectedFY);
+
   const depositsThisFY = transactions
     .filter((t: any) => t.type === 'Deposit' && getFinancialYear(t.transactionDate) === currentFY)
     .reduce((sum: number, t: any) => sum + t.amount, 0);
@@ -128,10 +132,22 @@ export function PPFClient({ account }: { account: any }) {
           <div className="bg-card border border-separator/30 rounded-2xl overflow-hidden shadow-sm">
             <div className="px-6 py-4 border-b border-separator/30 flex justify-between items-center bg-muted/20">
               <h2 className="font-bold text-lg">Transaction Ledger</h2>
+              <select 
+                value={selectedFY} 
+                onChange={(e) => setSelectedFY(Number(e.target.value))}
+                className="bg-background border border-separator/30 rounded-lg px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-tint"
+              >
+                {!availableFYs.includes(currentFY) && (
+                  <option value={currentFY}>FY {currentFY}-{currentFY+1}</option>
+                )}
+                {availableFYs.map(fy => (
+                  <option key={fy} value={fy}>FY {fy}-{fy+1}</option>
+                ))}
+              </select>
             </div>
-            {ledger.length === 0 ? (
+            {displayedLedger.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
-                No transactions found.
+                No transactions found for FY {selectedFY}-{selectedFY+1}.
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -147,7 +163,7 @@ export function PPFClient({ account }: { account: any }) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-separator/20">
-                    {[...ledger].reverse().map((entry, idx) => (
+                    {[...displayedLedger].reverse().map((entry, idx) => (
                       <tr key={entry.id + idx} className="hover:bg-muted/10 transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">{format(new Date(entry.date), "dd MMM yyyy")}</td>
                         <td className="px-6 py-4">

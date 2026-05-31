@@ -43,6 +43,7 @@ export const useAssetStore = create<AssetStore>()(
     }),
     {
       name: 'user-assets-cache',
+      version: 1, // Bumped version to clear stale cache without rawTransactions
     }
   )
 );

@@ -189,7 +189,13 @@ export async function getUserAssets() {
         metadata: {
           maturityDate,
           extensionBlocks: ppf.extensionBlocks,
-          transactionsCount: ppf.transactions.length
+          transactionsCount: ppf.transactions.length,
+          rawTransactions: ppf.transactions.map(t => ({
+            id: t.id,
+            amount: Number(t.amount),
+            transactionDate: t.transactionDate,
+            type: t.type
+          }))
         }
       };
     })
