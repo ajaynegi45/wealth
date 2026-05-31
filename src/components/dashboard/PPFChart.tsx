@@ -5,10 +5,12 @@ import { TrendingUp, AlertCircle, Info } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { formatINR } from "@/lib/formatters";
+import { useUIStore } from "@/store/useUIStore";
 import { calculatePPFLedger } from "@/lib/calculations/ppf";
 import { addMonths, addDays, addYears, format, min, max, differenceInDays, differenceInMonths, differenceInYears, isBefore, isAfter } from "date-fns";
 
 export function PPFChart({ asset, title = "PPF Growth & Simulation" }: { asset: any, title?: string }) {
+  const { hideAmounts } = useUIStore();
   const today = new Date();
 
   if (!asset || !asset.metadata || !asset.metadata.rawTransactions) {
@@ -159,7 +161,7 @@ export function PPFChart({ asset, title = "PPF Growth & Simulation" }: { asset: 
             )}
           </h3>
           <div className="text-xl sm:text-2xl md:text-4xl font-bold text-foreground tracking-tight">
-            {formatINR(actualBalance)}
+            {hideAmounts ? "* * * * *" : formatINR(actualBalance)}
           </div>
         </div>
         
@@ -168,7 +170,7 @@ export function PPFChart({ asset, title = "PPF Growth & Simulation" }: { asset: 
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-muted-foreground">Lost Interest:</span>
               <span className="text-sm font-bold text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full">
-                {formatINR(lostInterest)}
+                {hideAmounts ? "* *" : formatINR(lostInterest)}
               </span>
             </div>
           </div>
@@ -224,7 +226,7 @@ export function PPFChart({ asset, title = "PPF Growth & Simulation" }: { asset: 
                             {name === 'principal' ? 'Invested Amount' : name === 'gains' ? 'Interest Gained' : 'Lost Interest'}
                           </span>
                           <span className="font-mono font-medium text-foreground tabular-nums">
-                            {formatINR(Number(actualValue))}
+                            {hideAmounts ? "*****" : formatINR(Number(actualValue))}
                           </span>
                         </div>
                       </>

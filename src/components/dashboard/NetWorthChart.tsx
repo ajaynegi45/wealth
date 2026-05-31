@@ -4,12 +4,14 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { formatINR } from "@/lib/formatters";
+import { useUIStore } from "@/store/useUIStore";
 import { calculateFDCurrentValue, calculateFDInterestPaidOut } from "@/lib/calculations/fd";
 import { calculateSimulatedMarketValue } from "@/lib/calculations/marketSim";
 import { calculatePPFLedger } from "@/lib/calculations/ppf";
 import { addMonths, addDays, addYears, format, max, min, differenceInMonths, differenceInDays, differenceInYears, isBefore, isAfter } from "date-fns";
 
 export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { assets?: any[], title?: string }) {
+  const { hideAmounts } = useUIStore();
   const today = new Date();
   
   const ppfLedgers = new Map<number, any[]>();
@@ -236,7 +238,7 @@ export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { asset
             {title}
           </h3>
           <div className="text-xl sm:text-2xl md:text-4xl font-bold text-foreground tracking-tight">
-            {formatINR(currentTotal)}
+            {hideAmounts ? "* * * * *" : formatINR(currentTotal)}
           </div>
         </div>
         {totalPrincipal > 0 && (
@@ -289,7 +291,7 @@ export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { asset
                           {name === 'principal' ? 'Invested Amount' : 'Returns Gained'}
                         </span>
                         <span className="font-mono font-medium text-foreground tabular-nums">
-                          {formatINR(Number(value))}
+                          {hideAmounts ? "*****" : formatINR(Number(value))}
                         </span>
                       </div>
                     </>
