@@ -190,7 +190,7 @@ export function PortfolioClient() {
               : "bg-card/90 border-separator/30";
 
             return (
-              <div key={asset.id} className={`${cardClasses} border p-5 rounded-xl shadow-sm flex flex-col transition-transform hover:scale-[1.01]`}>
+              <div key={`${asset.type}-${asset.id}`} className={`${cardClasses} border p-5 rounded-xl shadow-sm flex flex-col transition-transform hover:scale-[1.01]`}>
                 <div className="flex justify-between items-start mb-5">
                   <div>
                     <div className="text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">{asset.type}</div>

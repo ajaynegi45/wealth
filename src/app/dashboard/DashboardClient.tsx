@@ -12,9 +12,13 @@ export function DashboardClient({ firstName }: { firstName: string }) {
     fetchAssets();
   }, [fetchAssets]);
 
+  const fdAssets = assets.filter((a) => a.type === "FD");
+  const stockAssets = assets.filter((a) => a.type === "Stock");
+  const mfAssets = assets.filter((a) => a.type === "Mutual Fund");
+
   return (
-    <div className="w-full h-full">
-      <div className="mb-8 max-w-lg mx-auto md:mx-0 text-center text-left">
+    <div className="w-full h-full pb-10">
+      <div className="mb-8 max-w-lg mx-auto md:mx-0 text-center md:text-left">
         <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground mb-3">
           Welcome back,<br />
           {firstName}.
@@ -29,7 +33,17 @@ export function DashboardClient({ firstName }: { firstName: string }) {
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       ) : (
-        <NetWorthChart assets={assets} />
+        <div className="space-y-6">
+          <NetWorthChart assets={assets} title="Live Net Worth" />
+
+          {(fdAssets.length > 0 || stockAssets.length > 0 || mfAssets.length > 0) && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-6 mt-6">
+              {fdAssets.length > 0 && <NetWorthChart assets={fdAssets} title="Fixed Deposits" />}
+              {stockAssets.length > 0 && <NetWorthChart assets={stockAssets} title="Stocks" />}
+              {mfAssets.length > 0 && <NetWorthChart assets={mfAssets} title="Mutual Funds" />}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

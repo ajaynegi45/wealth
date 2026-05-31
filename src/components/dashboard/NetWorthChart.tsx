@@ -5,9 +5,10 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { formatINR } from "@/lib/formatters";
 import { calculateFDCurrentValue, calculateFDInterestPaidOut } from "@/lib/calculations/fd";
+import { calculateSimulatedMarketValue } from "@/lib/calculations/marketSim";
 import { addMonths, addDays, addYears, format, max, min, differenceInMonths, differenceInDays, differenceInYears, isBefore, isAfter } from "date-fns";
 
-export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
+export function NetWorthChart({ assets = [], title = "Live Net Worth" }: { assets?: any[], title?: string }) {
   const today = new Date();
   
   // Calculate Live Current Total and True Returns
@@ -43,12 +44,16 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
         today
       );
 
-      // Both cv and paidOut are now strictly Gross (pre-tax) as requested.
       totalAbsoluteReturns += (cv - Number(a.amount)) + paidOut;
       return sum + cv;
     }
     
-    totalAbsoluteReturns += 0; // For stock/mutual funds we aren't tracking live prices yet
+    if (a.type === "Stock" || a.type === "Mutual Fund") {
+      const cv = calculateSimulatedMarketValue(Number(a.amount), a.id, new Date(a.startDate), today, a.type as any);
+      totalAbsoluteReturns += (cv - Number(a.amount));
+      return sum + cv;
+    }
+    
     return sum + Number(a.amount);
   }, 0);
 
@@ -129,6 +134,17 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
             currDate
           );
         }
+
+        if (a.type === "Stock" || a.type === "Mutual Fund") {
+          return sum + calculateSimulatedMarketValue(
+            Number(a.amount), 
+            a.id, 
+            new Date(a.startDate), 
+            currDate, 
+            a.type as any
+          );
+        }
+
         return sum + Number(a.amount);
       }, 0);
 
@@ -153,7 +169,7 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
 
   const chartConfig = {
     netWorth: {
-      label: "Net Worth",
+      label: "Value",
       color: chartColor,
     },
   } satisfies ChartConfig;
@@ -163,7 +179,7 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
       <div className="flex flex-row items-start justify-between space-y-0 pb-6 px-8 pt-8">
         <div className="space-y-1">
           <h3 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-            Live Net Worth
+            {title}
           </h3>
           <div className="text-xl sm:text-2xl md:text-4xl font-bold text-foreground tracking-tight">
             {formatINR(currentTotal)}
@@ -211,7 +227,7 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
                         style={{ backgroundColor: item.color || chartColor }}
                       />
                       <div className="flex flex-1 justify-between gap-2 leading-none items-center">
-                        <span className="text-muted-foreground">Net Worth</span>
+                        <span className="text-muted-foreground">Value</span>
                         <span className="font-mono font-medium text-foreground tabular-nums">
                           {formatINR(Number(value))}
                         </span>
