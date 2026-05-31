@@ -21,8 +21,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen bg-background relative">
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden md:flex flex-col border-r border-separator/30 bg-card/50 backdrop-blur-xl transition-all duration-300 ease-in-out sticky top-0 h-screen ${
-          isSidebarCollapsed ? "w-20" : "w-64"
+        className={`hidden md:flex flex-col border-r border-separator/30 bg-card/50 backdrop-blur-xl transition-all duration-300 ease-in-out sticky top-0 self-start h-screen ${
+          isSidebarCollapsed ? "w-20" : "w-54"
         }`}
       >
         <button
@@ -46,7 +46,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center h-12 rounded-xl transition-all duration-300 group overflow-hidden whitespace-nowrap ${
+                className={`flex items-center h-12 rounded-lg transition-all duration-300 group overflow-hidden whitespace-nowrap ${
                   isActive ? "bg-tint/10 text-tint" : "text-muted-foreground hover:bg-secondary/80 hover:text-foreground"
                 }`}
                 title={isSidebarCollapsed ? item.name : undefined}

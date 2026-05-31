@@ -27,7 +27,7 @@ export function DeleteAssetButton({ id, type }: { id: number, type: "FD" | "Stoc
     <button
       onClick={handleDelete}
       disabled={loading}
-      className="p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive rounded-full transition-colors disabled:opacity-50"
+      className="p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive rounded-full transition-colors disabled:opacity-50 hover:cursor-pointer"
       title="Delete Asset"
     >
       <Trash2 className="w-4 h-4" />
