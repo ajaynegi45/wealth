@@ -3,12 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Wallet, ArrowLeftRight, User, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Wallet, ArrowLeftRight, User, LogOut, ChevronLeft, ChevronRight, Calculator } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 const NAV_ITEMS = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
+  { name: "Tax Calculator", href: "/dashboard/tax", icon: Calculator },
   { name: "Transactions", href: "/dashboard/transactions", icon: ArrowLeftRight },
   { name: "Profile", href: "/dashboard/profile", icon: User },
 ];

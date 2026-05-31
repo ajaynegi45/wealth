@@ -7,6 +7,9 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   phone: varchar("phone", { length: 20 }),
   password: varchar("password", { length: 255 }).notNull(),
+  grossIncome: numeric("gross_income", { precision: 15, scale: 2 }).default("0").notNull(),
+  deduction80c: numeric("deduction_80c", { precision: 15, scale: 2 }).default("0").notNull(),
+  otherDeductions: numeric("other_deductions", { precision: 15, scale: 2 }).default("0").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
