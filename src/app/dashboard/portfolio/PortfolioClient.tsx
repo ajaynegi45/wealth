@@ -5,7 +5,7 @@ import { AddAssetModal } from "@/components/portfolio/AddAssetModal";
 import { DeleteAssetButton } from "@/components/portfolio/DeleteAssetButton";
 import { calculateFDCurrentValue, calculateFDMaturityValue, calculateFDInterestPaidOut, getFDMaturityDate, calculateFDTDS } from "@/lib/calculations/fd";
 import { formatINR } from "@/lib/formatters";
-import { format } from "date-fns";
+import { format, intervalToDuration } from "date-fns";
 import { Wallet, TrendingUp, Loader2 } from "lucide-react";
 import { useAssetStore } from "@/store/useAssetStore";
 
@@ -56,15 +56,15 @@ export function PortfolioClient() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-card/50 backdrop-blur-xl border border-separator/30 p-6 rounded-3xl shadow-sm">
+        <div className="bg-card/50 border border-separator/30 p-6 rounded-2xl shadow-sm">
           <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase mb-2">Total Invested</h3>
           <div className="text-3xl font-bold">{formatINR(totalPrincipal)}</div>
         </div>
-        <div className="bg-card/50 backdrop-blur-xl border border-separator/30 p-6 rounded-3xl shadow-sm">
+        <div className="bg-card/50 border border-separator/30 p-6 rounded-2xl shadow-sm">
           <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase mb-2">Current Value</h3>
           <div className="text-3xl font-bold">{formatINR(totalCurrentValue)}</div>
         </div>
-        <div className="bg-card/50 backdrop-blur-xl border border-separator/30 p-6 rounded-3xl shadow-sm">
+        <div className="bg-card/50 border border-separator/30 p-6 rounded-2xl shadow-sm">
           <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase mb-2">Total Returns</h3>
           <div className="flex items-center gap-2">
             <div className={`text-3xl font-bold ${totalReturns >= 0 ? "text-success" : "text-destructive"}`}>
@@ -98,14 +98,42 @@ export function PortfolioClient() {
             let isAutoRenewing = false;
 
             if (asset.type === "FD") {
-              const maturityDate = getFDMaturityDate(
+              const originalMaturityDate = getFDMaturityDate(
                 new Date(asset.startDate),
                 meta.durationYears || 0,
                 meta.durationMonths || 0,
                 meta.durationDays || 0
               );
-              isMatured = new Date() >= maturityDate;
+              isMatured = new Date() >= originalMaturityDate;
               isAutoRenewing = isMatured && (meta.autoRenew === true);
+
+              let currentMaturityDate = originalMaturityDate;
+              if (isAutoRenewing) {
+                while (currentMaturityDate <= new Date()) {
+                  currentMaturityDate = getFDMaturityDate(
+                    currentMaturityDate,
+                    meta.durationYears || 0,
+                    meta.durationMonths || 0,
+                    meta.durationDays || 0
+                  );
+                }
+              }
+              meta.displayMaturityDate = currentMaturityDate;
+
+              if (isAutoRenewing) {
+                const duration = intervalToDuration({ start: new Date(asset.startDate), end: new Date() });
+                meta.displayDuration = [
+                  duration.years ? `${duration.years}Y` : null,
+                  duration.months ? `${duration.months}M` : null,
+                  duration.days ? `${duration.days}D` : null,
+                ].filter(Boolean).join(" ");
+              } else {
+                meta.displayDuration = [
+                  meta.durationYears ? `${meta.durationYears}Y` : null,
+                  meta.durationMonths ? `${meta.durationMonths}M` : null,
+                  meta.durationDays ? `${meta.durationDays}D` : null,
+                ].filter(Boolean).join(" ");
+              }
 
               currentValue = calculateFDCurrentValue(
                 Number(asset.amount), 
@@ -231,9 +259,19 @@ export function PortfolioClient() {
                 </div>
 
                 <div className="pt-4 border-t border-separator/20 text-xs text-muted-foreground flex justify-between items-center font-medium">
-                  <span>Started: {format(new Date(asset.startDate), "MMM dd, yyyy")}</span>
+                  <div className="flex flex-col gap-1">
+                    <span>Started: {format(new Date(asset.startDate), "MMM dd, yyyy")}</span>
+                    {asset.type === "FD" && meta.displayMaturityDate && (
+                      <span>Matures: {format(meta.displayMaturityDate, "MMM dd, yyyy")}</span>
+                    )}
+                  </div>
                   {asset.type === "FD" && (
-                    <span>{meta.durationYears}Y {meta.durationMonths}M {meta.durationDays}D</span>
+                    <div className="flex flex-col items-end gap-1 text-right">
+                      <span>{meta.displayDuration}</span>
+                      {isAutoRenewing && (
+                        <span className="text-[10px] opacity-70 tracking-widest uppercase">Total Active</span>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

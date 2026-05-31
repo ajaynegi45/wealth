@@ -98,7 +98,7 @@ export function AddAssetModal() {
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 bg-tint text-background px-4 py-2 rounded-xl font-medium shadow-sm hover:opacity-90 transition-opacity"
+        className="flex items-center gap-2 bg-tint text-background px-4 py-2 rounded-sm font-medium shadow-sm hover:opacity-90 transition-opacity hover:cursor-pointer"
       >
         <Plus className="w-4 h-4" /> Add Asset
       </button>
