@@ -185,6 +185,8 @@ export function PortfolioClient() {
 
             const cardClasses = isMatured && !isAutoRenewing
               ? "bg-warning/10 border-warning/50 shadow-[0_0_15px_rgba(245,158,11,0.1)]"
+              : isAutoRenewing
+              ? "bg-tint/5 border-tint/40 shadow-sm"
               : "bg-card/90 border-separator/30";
 
             return (
