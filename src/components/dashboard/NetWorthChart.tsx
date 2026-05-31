@@ -4,7 +4,7 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { formatINR } from "@/lib/formatters";
-import { calculateFDCurrentValue, calculateFDInterestPaidOut, calculateFDTDS } from "@/lib/calculations/fd";
+import { calculateFDCurrentValue, calculateFDInterestPaidOut } from "@/lib/calculations/fd";
 import { addMonths, addDays, addYears, format, max, min, differenceInMonths, differenceInDays, differenceInYears, isBefore, isAfter } from "date-fns";
 
 export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
@@ -43,19 +43,7 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
         today
       );
 
-      const tds = calculateFDTDS(
-        Number(a.amount), 
-        Number(a.metadata.interestRate), 
-        new Date(a.startDate), 
-        a.metadata.durationYears || 0,
-        a.metadata.durationMonths || 0,
-        a.metadata.durationDays || 0,
-        a.metadata.compoundingFrequency || "Quarterly",
-        a.metadata.autoRenew || false,
-        today
-      );
-
-      // Note: cv and paidOut are ALREADY post-TDS, so we don't subtract TDS again.
+      // Both cv and paidOut are now strictly Gross (pre-tax) as requested.
       totalAbsoluteReturns += (cv - Number(a.amount)) + paidOut;
       return sum + cv;
     }
@@ -213,7 +201,25 @@ export function NetWorthChart({ assets = [] }: { assets?: any[] }) {
             />
             <ChartTooltip 
               cursor={{ stroke: 'var(--separator)', strokeWidth: 1, strokeDasharray: '4 4' }} 
-              content={<ChartTooltipContent indicator="dot" />} 
+              content={
+                <ChartTooltipContent 
+                  indicator="dot" 
+                  formatter={(value, name, item) => (
+                    <>
+                      <div
+                        className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                        style={{ backgroundColor: item.color || chartColor }}
+                      />
+                      <div className="flex flex-1 justify-between gap-2 leading-none items-center">
+                        <span className="text-muted-foreground">Net Worth</span>
+                        <span className="font-mono font-medium text-foreground tabular-nums">
+                          {formatINR(Number(value))}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                />
+              } 
             />
             <Area
               dataKey="netWorth"

@@ -88,11 +88,8 @@ export function calculateFDCurrentValue(
   }
 
   let grossInterest = calculateCompoundInterest(principal, interestRate, startDate, now, compounding);
-  
-  // Apply TDS rule if applicable
-  const netInterest = applyTDS(grossInterest);
 
-  return principal + netInterest;
+  return principal + grossInterest;
 }
 
 export function calculateFDMaturityValue(
@@ -141,8 +138,8 @@ export function calculateFDInterestPaidOut(
 
   let grossInterest = calculateCompoundInterest(principal, interestRate, startDate, now, compounding);
   
-  // Return post-TDS paid out interest
-  return applyTDS(grossInterest);
+  // Return gross paid out interest
+  return grossInterest;
 }
 
 export function calculateFDTDS(

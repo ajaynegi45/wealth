@@ -204,8 +204,8 @@ export function PortfolioClient() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground font-medium">Returns</span>
-                    <span className={`font-semibold ${returns + tdsAmount >= 0 ? "text-success" : "text-destructive"}`}>
-                      {returns + tdsAmount >= 0 ? "+" : ""}{formatINR(returns + tdsAmount)}
+                    <span className={`font-semibold ${returns >= 0 ? "text-success" : "text-destructive"}`}>
+                      {returns >= 0 ? "+" : ""}{formatINR(returns)}
                     </span>
                   </div>
                   {paidOutInterest > 0 && (
