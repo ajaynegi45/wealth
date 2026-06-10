@@ -3,7 +3,7 @@
 import { useState, Fragment } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Wallet, ArrowLeftRight, User, LogOut, ChevronLeft, ChevronRight, Calculator, Plus } from "lucide-react";
+import { House, Wallet, ArrowLeftRight, User, LogOut, ChevronLeft, ChevronRight, MessageSquare, Plus } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { AddAssetModal } from "@/components/portfolio/AddAssetModal";
 import { useUIStore } from "@/store/useUIStore";
@@ -11,7 +11,7 @@ import { useUIStore } from "@/store/useUIStore";
 const NAV_ITEMS = [
   { name: "Dashboard", href: "/dashboard", icon: House },
   { name: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
-  { name: "Tax Calculator", href: "/dashboard/tax", icon: Calculator },
+  { name: "Feedback", href: "/dashboard/feedback", icon: MessageSquare },
   { name: "Profile", href: "/dashboard/profile", icon: User },
 ];
 

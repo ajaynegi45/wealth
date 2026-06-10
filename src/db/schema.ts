@@ -102,6 +102,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   mutualFunds: many(mutualFunds),
   ppfAccounts: many(ppfAccounts),
   bankAccounts: many(bankAccounts),
+  feedbacks: many(feedbacks),
 }));
 
 export const ppfAccountsRelations = relations(ppfAccounts, ({ one, many }) => ({
@@ -118,3 +119,20 @@ export const ppfTransactionsRelations = relations(ppfTransactions, ({ one }) => 
     references: [ppfAccounts.id],
   }),
 }));
+
+export const feedbacks = pgTable("feedbacks", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .references(() => users.id, { onDelete: "set null" }),
+  type: varchar("type", { length: 50 }).notNull(), // 'suggestion', 'bug', 'mistake', 'other'
+  message: varchar("message", { length: 5000 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const feedbacksRelations = relations(feedbacks, ({ one }) => ({
+  user: one(users, {
+    fields: [feedbacks.userId],
+    references: [users.id],
+  }),
+}));
+
